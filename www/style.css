@@ -487,6 +487,22 @@ label, .control-label, .form-label,
   background-blend-mode: overlay;
 }
 
+/* Ensure these pages are tall enough so the footer sits at the bottom of the
+   viewport rather than overlapping charts when the content is short. We avoid
+   global layout changes and target only these page containers. */
+.page-bg-plantdash, .page-bg-datatable {
+  position: relative;
+  /* reserve space for header + footer (approx). Adjust if your navbar/footer sizes differ */
+  min-height: calc(100vh - 140px);
+  padding-bottom: 24px; /* breathing room above footer */
+}
+
+/* Ensure footer appears above background elements and doesn't get visually hidden */
+.site-footer {
+  position: relative;
+  z-index: 50;
+}
+
 /* Small subtle scale-up on hover before full expansion to indicate interactivity */
 .mm-card .plotly:hover .plotly-graph-div,
 .mm-card .leaflet-container:hover {
