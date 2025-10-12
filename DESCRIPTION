@@ -1,0 +1,19 @@
+Package: MaquerinaMundo
+Type: Package
+Title: Maquerina Mundo — Solarpunk dashboard for plants and climate
+Version: 0.1.0
+Authors@R: person("Alejandro", "Ines", role = c("aut", "cre"))
+Description: Maquerina Mundo is a Shiny-based project and lightweight R package that explores
+ relationships between plant growth and climate variables through interactive visualizations,
+ mapping, and small analysis helpers. It bundles convenience functions for data loading,
+ summary statistics, and plotting to support teaching, demos, and prototyping in a solarpunk
+ aesthetic. This field intentionally provides a longer description to satisfy package
+ metadata requirements and to give readers context about the project's goals and scope.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: shiny, bslib, tidyverse, plotly, leaflet, DT, showtext, ragg, htmltools, lubridate, scales, ggthemes, corrplot
+URL: https://example.com/maquerinamundo
+BugReports: https://example.com/maquerinamundo/issues
+Video: https://youtu.be/VIDEO_ID
+

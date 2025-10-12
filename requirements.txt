@@ -1,0 +1,14 @@
+# R package dependencies
+shiny
+bslib
+tidyverse
+plotly
+leaflet
+DT
+showtext
+ragg
+htmltools
+lubridate
+scales
+ggthemes
+corrplot
