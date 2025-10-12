@@ -63,9 +63,13 @@
         btn.addEventListener('click', function(ev){ ev.stopPropagation(); card.classList.remove('expanded-widget'); triggerResizes(card, false); btn.remove(); removeOverlay(); });
         card.appendChild(btn);
       }
+      // show overlay when a card expands
+      showOverlay();
     } else {
       card.classList.remove('expanded-widget');
       var existing = card.querySelector('.expand-close'); if (existing) existing.remove();
+      // remove overlay when collapsing
+      removeOverlay();
     }
     // give CSS transition a moment to apply then redraw widgets
     setTimeout(function(){ triggerResizes(card, willExpand); }, willExpand ? 180 : 260);
@@ -74,8 +78,8 @@
   function attach(){
     var cards = document.querySelectorAll('.mm-card');
     cards.forEach(function(card){
-      // Do not attach expansion behavior to the three feature boxes on the Home page
-      if (card.classList && card.classList.contains('mm-feature')) return;
+      // Skip attaching expansion behavior when a card is explicitly opted-out
+      if (card.classList && (card.classList.contains('mm-feature') || card.classList.contains('mm-no-expand'))) return;
       if (card._expandAttached) return;
       card._expandAttached = true;
       // dblclick remains as a fallback/power-user gesture
@@ -83,23 +87,33 @@
         var c = findCard(e.target) || card;
         toggleCard(c);
       });
-
-      // hover-with-delay behavior
-      var hoverDelay = MM_HOVER_DELAY_MS; // ms default (configurable above)
-      var hoverTimer = null;
-      card.addEventListener('mouseenter', function(e){
-        // don't start timer if already expanded
-        if (card.classList.contains('expanded-widget')) return;
-        hoverTimer = setTimeout(function(){
-          toggleCard(card);
-          showOverlay();
-        }, hoverDelay);
-        card._hoverTimer = hoverTimer;
-      });
-      card.addEventListener('mouseleave', function(e){
-        if (card._hoverTimer) { clearTimeout(card._hoverTimer); card._hoverTimer = null; }
-        // if the card was expanded via hover and the mouse leaves the card while expanded, we keep it open
-      });
+      // Determine if this card lives inside a page that should use click-to-expand
+      var clickOnly = !!card.closest('.page-bg-plantdash, .page-bg-climateexplorer');
+      if (clickOnly) {
+        // single-click expands/collapses (ignore clicks on links, buttons, inputs)
+        card.addEventListener('click', function(e){
+          var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+          if (tag === 'a' || tag === 'button' || tag === 'input' || e.target.closest && e.target.closest('a, button, input')) return;
+          var c = findCard(e.target) || card;
+          toggleCard(c);
+        });
+      } else {
+        // hover-with-delay behavior for other pages
+        var hoverDelay = MM_HOVER_DELAY_MS; // ms default (configurable above)
+        var hoverTimer = null;
+        card.addEventListener('mouseenter', function(e){
+          // don't start timer if already expanded
+          if (card.classList.contains('expanded-widget')) return;
+          hoverTimer = setTimeout(function(){
+            toggleCard(card);
+          }, hoverDelay);
+          card._hoverTimer = hoverTimer;
+        });
+        card.addEventListener('mouseleave', function(e){
+          if (card._hoverTimer) { clearTimeout(card._hoverTimer); card._hoverTimer = null; }
+          // if the card was expanded via hover and the mouse leaves the card while expanded, we keep it open
+        });
+      }
     });
   }
 
