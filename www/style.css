@@ -30,6 +30,27 @@ body, html {
   overflow-x: hidden;
 }
 
+/* Layout: make body a column flex container so page content can grow and
+   naturally push the footer to the bottom of the viewport. This prevents the
+   footer from appearing halfway down pages with charts. */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Ensure main content containers expand to fill available space (so the
+   footer sits at the bottom of the page). The app uses Bootstrap containers; we
+   target common wrapper classes conservatively. */
+.container, .container-fluid, .page-content, .bs-content, .page {
+  flex: 1 0 auto;
+}
+
+/* Footer should not shrink and should remain visible at the bottom */
+.site-footer {
+  flex-shrink: 0;
+}
+
 /* ===== Navbar ===== */
 .navbar {
   background: rgba(36, 62, 54, 0.9) !important;
