@@ -116,6 +116,24 @@ body, html {
   letter-spacing: 0.6px;
 }
 
+/* Lower the hero quote visually without changing hero size. On large screens
+   move the quote further down using a relative top offset. Keep small screens
+   unchanged to avoid layout issues. */
+@media (min-width: 769px) {
+  .mm-hero-quote-text {
+    transform: translateY(28px); /* push quote down inside hero */
+  }
+  .mm-hero {
+    padding-top: 80px; /* keep top padding similar but allow extra room */
+    padding-bottom: 60px; /* ensure hero still reserves space for the lowered quote */
+  }
+}
+
+@media (max-width: 768px) {
+  /* On narrow screens, keep the quote closer to top to avoid cutting it off */
+  .mm-hero-quote-text { transform: translateY(0); }
+}
+
 /* Decorative large quote mark */
 .site-footer {
   display: flex;
@@ -146,6 +164,40 @@ body, html {
 .mm-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 0 25px rgba(227, 197, 103, 0.25);
+}
+
+/* Modern select styling */
+.shiny-input-container .selectize-input,
+.shiny-input-container select.form-control {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text-light);
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 6px 18px rgba(36,62,54,0.2);
+}
+
+.shiny-input-container .selectize-input:focus,
+.shiny-input-container select.form-control:focus {
+  outline: none;
+  border-color: var(--green-leaf);
+  box-shadow: 0 8px 26px rgba(107,191,143,0.14);
+}
+
+/* Add safe spacing between stacked plot outputs and enforce a min height so they don't collapse */
+.mm-card .plotly, .mm-card .leaflet-container {
+  margin-bottom: 12px;
+  min-height: 140px;
+}
+
+/* Modern plot tooltip and title tweaks */
+.plotly .modebar, .plotly .legend {
+  border-radius: 8px;
+}
+
+/* give charts a subtle inner glow */
+.plotly, .leaflet-container {
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));
 }
 
 /* Gold frame highlight */
@@ -183,6 +235,15 @@ body, html {
 .mm-feature-nasa::before { content: '\2699'; /* gear */ }
 .mm-feature-solarpunk::before { content: '\2600'; /* sun */ }
 .mm-feature-news::before { content: '\2709'; /* envelope */ }
+
+/* Feature row placement and spacing: ensure a larger gap below the hero and
+   avoid overlapping the footer. The bottom margin provides breathing room. */
+.mm-feature-row {
+  margin-top: 48px; /* extra vertical gap between hero and feature cards */
+  margin-bottom: 48px; /* prevent overlap with footer on short pages */
+  padding-left: 6px;
+  padding-right: 6px;
+}
 
 /* Sidebar label style to match the correlation text color */
 .mm-sidebar-label {
@@ -297,4 +358,145 @@ label, .control-label, .form-label,
   .mm-feature h4 { padding-left: 44px; }
   .mm-feature h4::before { font-size: 22px; left: 8px; }
   .mm-hero { background-size: cover !important; background-position: center top !important; }
+}
+
+/* ===== Hover-expand widget behavior ===== */
+/* Make internal graphs slightly smaller so they don't feel squeezed */
+.mm-card .plotly,
+.mm-card .plotly .plotly-graph-div,
+.mm-card .leaflet-container {
+  /* make inner plots slightly smaller in normal view so they don't feel squeezed */
+  transform: scale(0.90);
+  transform-origin: center center;
+  transition: transform 260ms ease, box-shadow 260ms ease, width 260ms ease, height 260ms ease;
+}
+
+/* Container when expanded — fixed, full-viewport, elevated */
+.expanded-widget {
+  /* center as a square that fits within the viewport */
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: min(92vw, 92vh) !important;
+  height: min(92vw, 92vh) !important;
+  transform: translate(-50%, -50%) !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  border-radius: 12px !important;
+  z-index: 99999 !important;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.65) !important;
+  transition: all 320ms cubic-bezier(.2,.9,.2,1) !important;
+  background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.6)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ensure Plotly / Leaflet children stretch to fill expanded square and are centered */
+.expanded-widget .plotly-graph-div,
+.expanded-widget .leaflet-pane,
+.expanded-widget .leaflet-container,
+.expanded-widget .html-widget {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+/* If a plotly wrapper exists, ensure its inner container uses flex to center content */
+.expanded-widget .plotly {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Close button for expanded widgets */
+.expanded-widget .expand-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background: rgba(0,0,0,0.6);
+  color: var(--text-light);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 20px;
+  line-height: 34px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  transition: transform 160ms ease, background 160ms ease;
+}
+.expanded-widget .expand-close:hover { transform: scale(1.06); background: rgba(0,0,0,0.75); }
+
+/* overlay used when a card is expanded */
+.mm-expand-overlay {
+  backdrop-filter: blur(3px);
+}
+
+/* utility classes for image-backed transparent boxes */
+.mm-bg-nasa {
+  background-image: url('nasa.webp');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  /* darken the image and add transparency so text remains readable */
+  background-color: rgba(0,0,0,0.36);
+  background-blend-mode: multiply;
+}
+.mm-bg-solarpunk {
+  background-image: url('solarpunk.webp');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: rgba(0,0,0,0.36);
+  background-blend-mode: multiply;
+}
+.mm-bg-climate2 {
+  background-image: url('climate2.jpeg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: rgba(0,0,0,0.36);
+  background-blend-mode: multiply;
+}
+
+/* page background utilities for dashboards */
+.page-bg-plantdash {
+  background-image: url('plantdash.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: rgba(0,0,0,0.22);
+  background-blend-mode: overlay;
+}
+.page-bg-climateexplorer {
+  background-image: url('climate.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: rgba(0,0,0,0.24);
+  background-blend-mode: overlay;
+}
+.page-bg-datatable {
+  background-image: url('rdata.webp');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: rgba(0,0,0,0.24);
+  background-blend-mode: overlay;
+}
+
+/* Small subtle scale-up on hover before full expansion to indicate interactivity */
+.mm-card .plotly:hover .plotly-graph-div,
+.mm-card .leaflet-container:hover {
+  transform: scale(0.96);
+}
+
+/* Direction/instruction text used inside panels */
+.direction-text {
+  color: var(--text-subtle);
+  font-size: 0.95rem;
+  margin: 6px 0 12px 0;
+  font-weight: 500;
 }
