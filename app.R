@@ -118,17 +118,19 @@ ui <- bslib::page_navbar(
                         p(style = "color:#E9F2E2;margin-top:10px;", "Correlation summary shown below uses Temperature paired with available climate variables (Precipitation or Wind).")
                     )
                 ),
-                bslib::layout_columns(
-                    col_widths = c(4, 4, 4),
-                    div(class = "mm-card mm-framed", plotlyOutput("growth_plot", height = "300px")),
-                    div(class = "mm-card mm-framed", plotlyOutput("species_counts", height = "300px")),
-                    div(class = "mm-card mm-framed", plotlyOutput("humidity_growth", height = "300px"))
-                ),
-                br(),
-                bslib::layout_columns(
-                    col_widths = c(6, 6),
-                    div(class = "mm-card mm-framed", leafletOutput("plant_map", height = 380)),
-                    div(class = "mm-card mm-framed", plotlyOutput("growth_trend_agg", height = 380))
+                div(class = "mm-plant-grid",
+                    bslib::layout_columns(
+                        col_widths = c(4, 4, 4),
+                        div(class = "mm-card mm-framed", plotlyOutput("growth_plot", height = "300px")),
+                        div(class = "mm-card mm-framed", plotlyOutput("species_counts", height = "300px")),
+                        div(class = "mm-card mm-framed", plotlyOutput("humidity_growth", height = "300px"))
+                    ),
+                    br(),
+                    bslib::layout_columns(
+                        col_widths = c(6, 6),
+                        div(class = "mm-card mm-framed", leafletOutput("plant_map", height = 380)),
+                        div(class = "mm-card mm-framed", plotlyOutput("growth_trend_agg", height = 380))
+                    )
                 )
             )
         )
