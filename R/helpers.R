@@ -12,6 +12,9 @@ format_num <- function(x, digits = 2) {
 
 # Simple correlation helper
 cor_summary <- function(df, var1, var2) {
+    if (!(var1 %in% names(df)) || !(var2 %in% names(df))) {
+        return(paste0("One or both variables not found: ", var1, ", ", var2))
+    }
     cor_val <- cor(df[[var1]], df[[var2]], use = "complete.obs")
     paste0("Correlation between ", var1, " and ", var2, ": ", round(cor_val, 2))
 }

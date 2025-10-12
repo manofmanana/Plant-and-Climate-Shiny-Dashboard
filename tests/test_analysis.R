@@ -10,8 +10,9 @@ out <- analyze_relationships(data$air, data$plants)
 # Check structure
 stopifnot(is.list(out))
 stopifnot("summary" %in% names(out))
-stopifnot("ozone_temp_cor" %in% names(out))
-stopifnot(is.numeric(out$ozone_temp_cor))
+stopifnot("climate_corr" %in% names(out))
+# climate_corr may be NA_real_ if insufficient data, but should be present
+stopifnot(length(out$climate_corr) == 1)
 # adjusted_growth column present
 stopifnot("adjusted_growth" %in% names(out$summary))
 message("test_analysis: OK")

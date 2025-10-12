@@ -9,7 +9,7 @@ observations to produce a summary dataset and a simple correlation metric.
 analyze_relationships(air, plants)
 }
 \arguments{
-\item{air}{A data frame containing at least \code{Ozone_Level} and \code{Temperature}.}
+\item{air}{A data frame containing climate variables such as \code{Temperature}, \code{Precipitation}, and \code{Wind}.}
 \item{plants}{A data frame or tibble containing plant observations with at least \code{growth_rate} and \code{humidity}.}
 }
 \value{
