@@ -251,8 +251,8 @@ body {
 /* Plant dashboard grid: responsive 2x2 layout with equal height cards */
 .mm-plant-grid {
   display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(2, 1fr);
+  gap: 30px; /* increased gap as requested */
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
   grid-auto-rows: 1fr; /* make rows equal height */
   align-items: start;
 }
@@ -262,7 +262,9 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   height: 100%;
-  padding: 20px;
+  padding: 22px; /* consistent inner padding */
+  min-height: 420px; /* ensure balanced card height */
+  box-sizing: border-box;
 }
 
 /* Make the map and larger plot items span two columns on desktop */
@@ -274,6 +276,32 @@ body {
 
 @media (max-width: 980px) {
   .mm-plant-grid { grid-template-columns: 1fr; }
+}
+
+/* Add breathing room around the dashboard section so cards don't touch navbar/footer */
+.page-bg-plantdash, .page-bg-climateexplorer {
+  margin-top: 28px;
+  margin-bottom: 32px;
+  padding-top: 6px; /* small internal padding to separate from navbar */
+}
+
+/* On wider screens, push the main grid away from the sidebar for breathing room */
+@media (min-width: 980px) {
+  .page-bg-plantdash .mm-plant-grid { margin-left: 28px; }
+  /* If the sidebar card is present, ensure it keeps its fixed visual width */
+  .page-bg-plantdash .mm-card.mm-no-expand { max-width: 340px; }
+}
+
+/* Also apply consistent spacing and min-heights to climate explorer cards */
+.page-bg-climateexplorer .mm-card {
+  min-height: 420px;
+  padding: 22px;
+}
+
+/* Ensure control bar / dropdown stays aligned with grid in climate explorer */
+@media (min-width: 980px) {
+  .page-bg-climateexplorer .mm-card:first-child { max-width: 340px; }
+  .page-bg-climateexplorer .mm-card:first-child + .mm-card { margin-left: 28px; }
 }
 
 /* Decorative symbols for the three feature cards: placed absolutely in the
