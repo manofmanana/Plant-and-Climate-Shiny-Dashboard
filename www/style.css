@@ -269,9 +269,22 @@ body {
 
 /* Make the map and larger plot items span two columns on desktop */
 .mm-plant-grid .leaflet-container,
+.mm-plant-grid .plotly, /* ensure the plotly wrapper expands */
 .mm-plant-grid .plotly-graph-div {
   width: 100% !important;
-  height: 100% !important;
+  height: calc(100% - 12px) !important; /* keep small breathing room inside card */
+  flex: 1 1 auto !important;
+  display: block !important;
+}
+
+/* Ensure the direct .plotly wrapper fills available vertical space */
+.mm-plant-grid .plotly {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.mm-plant-grid .plotly .plotly-graph-div {
+  flex: 1 1 auto !important;
 }
 
 @media (max-width: 980px) {
