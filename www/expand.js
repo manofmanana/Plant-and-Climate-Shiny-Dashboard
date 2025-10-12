@@ -87,33 +87,13 @@
         var c = findCard(e.target) || card;
         toggleCard(c);
       });
-      // Determine if this card lives inside a page that should use click-to-expand
-      var clickOnly = !!card.closest('.page-bg-plantdash, .page-bg-climateexplorer');
-      if (clickOnly) {
-        // single-click expands/collapses (ignore clicks on links, buttons, inputs)
-        card.addEventListener('click', function(e){
-          var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
-          if (tag === 'a' || tag === 'button' || tag === 'input' || e.target.closest && e.target.closest('a, button, input')) return;
-          var c = findCard(e.target) || card;
-          toggleCard(c);
-        });
-      } else {
-        // hover-with-delay behavior for other pages
-        var hoverDelay = MM_HOVER_DELAY_MS; // ms default (configurable above)
-        var hoverTimer = null;
-        card.addEventListener('mouseenter', function(e){
-          // don't start timer if already expanded
-          if (card.classList.contains('expanded-widget')) return;
-          hoverTimer = setTimeout(function(){
-            toggleCard(card);
-          }, hoverDelay);
-          card._hoverTimer = hoverTimer;
-        });
-        card.addEventListener('mouseleave', function(e){
-          if (card._hoverTimer) { clearTimeout(card._hoverTimer); card._hoverTimer = null; }
-          // if the card was expanded via hover and the mouse leaves the card while expanded, we keep it open
-        });
-      }
+      // Global single-click expand (ignore clicks on links/buttons/inputs)
+      card.addEventListener('click', function(e){
+        var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        if (tag === 'a' || tag === 'button' || tag === 'input' || (e.target.closest && e.target.closest('a, button, input'))) return;
+        var c = findCard(e.target) || card;
+        toggleCard(c);
+      });
     });
   }
 

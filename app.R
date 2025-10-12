@@ -106,7 +106,7 @@ ui <- bslib::page_navbar(
                 sidebar = bslib::sidebar(
                     open = TRUE,
                     div(
-                        class = "mm-card mm-framed",
+                        class = "mm-card mm-framed mm-no-expand",
                         h4("Filter", class = "mm-card-title"),
                         p("Select Species:", class = "mm-sidebar-label"),
                         selectInput("species", NULL,
@@ -164,7 +164,7 @@ ui <- bslib::page_navbar(
     # DATA TABLE
     bslib::nav_panel(
         title = "📊 Data Table",
-        div(class = "page-bg-datatable", div(class = "mm-card mm-framed", DTOutput("data_table")))
+        div(class = "page-bg-datatable", div(class = "mm-card mm-framed mm-no-expand", DTOutput("data_table")))
     )
 )
 
