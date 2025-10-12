@@ -139,16 +139,32 @@ body, html {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 22px;
+  padding: 18px 24px;
   color: var(--text-light); /* match the color used in card headings */
   font-size: 0.95rem;
-  /* yellow footer band using the solar gold color with subtle gradient */
-  background: linear-gradient(90deg, rgba(227,197,103,0.18), rgba(227,197,103,0.12));
-  border-top: 1px solid rgba(255,255,255,0.04);
+  /* place footer above background and UI elements */
+  position: relative;
+  z-index: 99999;
+  background: linear-gradient(90deg, rgba(227,197,103,0.22), rgba(227,197,103,0.14));
+  border-top: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(6px);
 }
 
 .site-footer-left { text-align: left; font-weight: 600; }
 .site-footer-right { text-align: right; font-weight: 600; }
+
+/* Keep footer dynamically in-flow. Use modest bottom padding so the footer
+   doesn't visually collide with content on shorter pages, while allowing
+   long pages to naturally push the footer down. */
+.page-bg-plantdash, .page-bg-climateexplorer, .page-bg-datatable, .mm-hero, .mm-card {
+  padding-bottom: 20px; /* modest breathing room above footer */
+}
+
+/* Extra bottom padding for pages that contain large graphs/tables so the footer
+   never sits halfway over charts on medium-height viewports */
+@media (min-height: 700px) {
+  .page-bg-plantdash, .page-bg-datatable { padding-bottom: 120px; }
+}
 
 /* ===== Cards & Boxes ===== */
 .mm-card {

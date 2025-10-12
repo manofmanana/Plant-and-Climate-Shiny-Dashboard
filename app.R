@@ -55,7 +55,7 @@ ui <- bslib::page_navbar(
     ),
     footer = tags$div(
         class = "site-footer",
-        tags$span(class = "site-footer-left", HTML("&copy; Alejandro Ines 2025")),
+        tags$span(class = "site-footer-left", HTML("&copy; Alejandro Ines")),
         tags$span(class = "site-footer-right", "Made with Shiny for R")
     ),
 
@@ -106,7 +106,7 @@ ui <- bslib::page_navbar(
                 sidebar = bslib::sidebar(
                     open = TRUE,
                     div(
-                        class = "mm-card mm-framed",
+                        class = "mm-card mm-framed mm-no-expand",
                         h4("Filter", class = "mm-card-title"),
                         p("Select Species:", class = "mm-sidebar-label"),
                         selectInput("species", NULL,
@@ -164,7 +164,7 @@ ui <- bslib::page_navbar(
     # DATA TABLE
     bslib::nav_panel(
         title = "📊 Data Table",
-        div(class = "page-bg-datatable", div(class = "mm-card mm-framed", DTOutput("data_table")))
+        div(class = "page-bg-datatable", div(class = "mm-card mm-framed mm-no-expand", DTOutput("data_table")))
     )
 )
 
