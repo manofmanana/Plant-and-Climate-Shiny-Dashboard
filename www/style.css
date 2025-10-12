@@ -28,10 +28,6 @@ body, html {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  /* Reserve space at the bottom equal (or larger) than the footer height so
-     a fixed footer doesn't overlap page content. Adjust if you change footer
-     sizing. */
-  padding-bottom: 110px;
 }
 
 /* ===== Navbar ===== */
@@ -139,25 +135,17 @@ body, html {
 }
 
 /* Decorative large quote mark */
+/* Default footer appearance — per-page footers will inherit this and be
+   positioned within their wrapper. */
 .site-footer {
-  /* Pin the footer to the bottom of the viewport so it always appears
-     visually at the bottom. We keep it elevated above page backgrounds but
-     below UI overlays/expanded widgets. */
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 14px 22px;
-  color: var(--text-light); /* match the color used in card headings */
+  color: var(--text-light);
   font-size: 0.95rem;
-  /* yellow footer band using the solar gold color with subtle gradient */
   background: linear-gradient(90deg, rgba(227,197,103,0.18), rgba(227,197,103,0.12));
   border-top: 1px solid rgba(255,255,255,0.04);
-  z-index: 9999;
-  box-shadow: 0 -6px 24px rgba(0,0,0,0.45);
 }
 
 .site-footer-left { text-align: left; font-weight: 600; }
@@ -510,8 +498,21 @@ label, .control-label, .form-label,
   padding-bottom: 24px; /* breathing room above footer */
 }
 
-/* Legacy duplicate rule updated above; keep this here for specificity fallbacks. */
-.site-footer { z-index: 9999; }
+/* Page wrapper helpers: make each page a column so the footer can be pushed
+   to the bottom of that page using margin-top: auto on the footer. Adjust the
+   min-height to account for your navbar/header height (approx 80px here). */
+.mm-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 80px);
+}
+.mm-page-content { flex: 1 0 auto; }
+.mm-page-footer.site-footer {
+  margin-top: auto;
+  position: relative;
+  z-index: 50;
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.25);
+}
 
 /* Small subtle scale-up on hover before full expansion to indicate interactivity */
 .mm-card .plotly:hover .plotly-graph-div,
