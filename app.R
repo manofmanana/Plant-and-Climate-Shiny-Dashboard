@@ -53,46 +53,49 @@ ui <- bslib::page_navbar(
         tags$link(rel = "icon", type = "image/jpeg", href = "favicon.jpg"),
         tags$script(src = "expand.js")
     ),
-    footer = tags$div(
-        class = "site-footer",
-        tags$span(class = "site-footer-left", HTML("&copy; Alejandro Ines 2025")),
-        tags$span(class = "site-footer-right", "Made with Shiny for R")
-    ),
 
     # HOME
     bslib::nav_panel(
         title = "🏡 Home",
         div(
-            class = "mm-hero",
-            style = "background: linear-gradient(rgba(30,48,41,0.55), rgba(14,24,21,0.85)), url('solar.JPG') center/cover no-repeat; border-radius:20px; padding:70px 30px; text-align:center; color:#E9F2E2; text-shadow:0 2px 6px rgba(0,0,0,0.4); position: relative;",
-            h1(style = "font-weight:700;font-size:2.4rem;color:#E3C567;", "Maquerina Mundo — Nature, Light & Data in Harmony"),
-            p(style = "font-size:1.1rem;max-width:700px;margin:0 auto 15px;", "Welcome to a solarpunk world where technology and ecology grow together. Discover how climate and plants coexist powered by sunlight and data."),
-            div(class = "mm-hero-quote", tags$p(class = "mm-hero-quote-text", '"A tree falls the way it leans. Be careful which way you lean."', tags$span(class = "mm-hero-quote-author", "~ The Lorax"))),
-            br()
-        ),
-        # feature cards placed below the hero so the hero size remains unchanged
-        div(
-            class = "mm-feature-row",
-            bslib::layout_columns(
-                col_widths = c(4, 4, 4),
-                div(
-                    class = "mm-card mm-framed mm-feature mm-feature-nasa mm-bg-nasa",
-                    h4("NASA Climate Tracker", style = "text-align:center;color:#FFF;"),
-                    p("Follow real time climate patterns, renewable energy insights, and sustainability progress around the world.", style = "text-align:center;color:#FFF;"),
-                    div(style = "text-align:center;", tags$a(href = "https://climate.nasa.gov/", target = "_blank", class = "mm-btn", "Visit NASA Climate Tracker"))
-                ),
-                div(
-                    class = "mm-card mm-framed mm-feature mm-feature-solarpunk mm-bg-solarpunk",
-                    h4("Solarpunk Literature & Ideas", style = "text-align:center;color:#FFF;"),
-                    p("Read stories, manifestos, and resources on building brighter ecological futures.", style = "text-align:center;color:#FFF;"),
-                    div(style = "text-align:center;", tags$a(href = "https://iandennismiller.github.io/solarpunk/", target = "_blank", class = "mm-btn", "Solarpunk Resources"))
-                ),
-                div(
-                    class = "mm-card mm-framed mm-feature mm-feature-news mm-bg-climate2",
-                    h4("Positive Climate News", style = "text-align:center;color:#FFF;"),
-                    p("Stay updated with hopeful, solution oriented stories about climate progress.", style = "text-align:center;color:#FFF;"),
-                    div(style = "text-align:center;", tags$a(href = "https://www.dailyclimate.org/good-news/", target = "_blank", class = "mm-btn", "Good News"))
+            class = "mm-page-wrapper",
+            div(
+                class = "mm-hero",
+                style = "background: linear-gradient(rgba(30,48,41,0.55), rgba(14,24,21,0.85)), url('solar.JPG') center/cover no-repeat; border-radius:20px; padding:70px 30px; text-align:center; color:#E9F2E2; text-shadow:0 2px 6px rgba(0,0,0,0.4); position: relative;",
+                h1(style = "font-weight:700;font-size:2.4rem;color:#E3C567;", "Maquerina Mundo — Nature, Light & Data in Harmony"),
+                p(style = "font-size:1.1rem;max-width:700px;margin:0 auto 15px;", "Welcome to a solarpunk world where technology and ecology grow together. Discover how climate and plants coexist powered by sunlight and data."),
+                div(class = "mm-hero-quote", tags$p(class = "mm-hero-quote-text", '"A tree falls the way it leans. Be careful which way you lean."', tags$span(class = "mm-hero-quote-author", "~ The Lorax"))),
+                br()
+            ),
+            # feature cards placed below the hero so the hero size remains unchanged
+            div(
+                class = "mm-feature-row",
+                bslib::layout_columns(
+                    col_widths = c(4, 4, 4),
+                    div(
+                        class = "mm-card mm-framed mm-feature mm-feature-nasa mm-bg-nasa",
+                        h4("NASA Climate Tracker", style = "text-align:center;color:#FFF;"),
+                        p("Follow real time climate patterns, renewable energy insights, and sustainability progress around the world.", style = "text-align:center;color:#FFF;"),
+                        div(style = "text-align:center;", tags$a(href = "https://climate.nasa.gov/", target = "_blank", class = "mm-btn", "Visit NASA Climate Tracker"))
+                    ),
+                    div(
+                        class = "mm-card mm-framed mm-feature mm-feature-solarpunk mm-bg-solarpunk",
+                        h4("Solarpunk Literature & Ideas", style = "text-align:center;color:#FFF;"),
+                        p("Read stories, manifestos, and resources on building brighter ecological futures.", style = "text-align:center;color:#FFF;"),
+                        div(style = "text-align:center;", tags$a(href = "https://iandennismiller.github.io/solarpunk/", target = "_blank", class = "mm-btn", "Solarpunk Resources"))
+                    ),
+                    div(
+                        class = "mm-card mm-framed mm-feature mm-feature-news mm-bg-climate2",
+                        h4("Positive Climate News", style = "text-align:center;color:#FFF;"),
+                        p("Stay updated with hopeful, solution oriented stories about climate progress.", style = "text-align:center;color:#FFF;"),
+                        div(style = "text-align:center;", tags$a(href = "https://www.dailyclimate.org/good-news/", target = "_blank", class = "mm-btn", "Good News"))
+                    )
                 )
+            ),
+            tags$div(
+                class = "mm-page-footer site-footer",
+                tags$span(class = "site-footer-left", HTML("&copy; Alejandro Ines 2025")),
+                tags$span(class = "site-footer-right", "Made with Shiny for R")
             )
         )
     ),
@@ -101,35 +104,43 @@ ui <- bslib::page_navbar(
     bslib::nav_panel(
         title = "🌱 Plant Growth Dashboard",
         div(
-            class = "page-bg-plantdash",
-            bslib::layout_sidebar(
-                sidebar = bslib::sidebar(
-                    open = TRUE,
-                    div(
-                        class = "mm-card mm-framed mm-no-expand",
-                        h4("Filter", class = "mm-card-title"),
-                        p("Select Species:", class = "mm-sidebar-label"),
-                        selectInput("species", NULL,
-                            choices = if (!is.null(analysis$summary$species)) na.omit(unique(as.character(analysis$summary$species))) else character(0),
-                            selected = if (!is.null(analysis$summary$species) && "Monstera" %in% analysis$summary$species) "Monstera" else if (!is.null(analysis$summary$species)) na.omit(as.character(unique(analysis$summary$species)))[1] else NULL
-                        ),
-                        p("Minimum Humidity:", class = "mm-sidebar-label"),
-                        sliderInput("humidity", NULL, min = 30, max = 90, value = 50),
-                        p(style = "color:#E9F2E2;margin-top:10px;", "Correlation summary shown below uses Temperature paired with available climate variables (Precipitation or Wind).")
+            class = "mm-page-wrapper page-bg-plantdash",
+            div(
+                class = "mm-page-content",
+                bslib::layout_sidebar(
+                    sidebar = bslib::sidebar(
+                        open = TRUE,
+                        div(
+                            class = "mm-card mm-framed mm-no-expand",
+                            h4("Filter", class = "mm-card-title"),
+                            p("Select Species:", class = "mm-sidebar-label"),
+                            selectInput("species", NULL,
+                                choices = if (!is.null(analysis$summary$species)) na.omit(unique(as.character(analysis$summary$species))) else character(0),
+                                selected = if (!is.null(analysis$summary$species) && "Monstera" %in% analysis$summary$species) "Monstera" else if (!is.null(analysis$summary$species)) na.omit(as.character(unique(analysis$summary$species)))[1] else NULL
+                            ),
+                            p("Minimum Humidity:", class = "mm-sidebar-label"),
+                            sliderInput("humidity", NULL, min = 30, max = 90, value = 50),
+                            p(style = "color:#E9F2E2;margin-top:10px;", "Correlation summary shown below uses Temperature paired with available climate variables (Precipitation or Wind).")
+                        )
+                    ),
+                    bslib::layout_columns(
+                        col_widths = c(4, 4, 4),
+                        div(class = "mm-card mm-framed", plotlyOutput("growth_plot", height = "300px")),
+                        div(class = "mm-card mm-framed", plotlyOutput("species_counts", height = "300px")),
+                        div(class = "mm-card mm-framed", plotlyOutput("humidity_growth", height = "300px"))
+                    ),
+                    br(),
+                    bslib::layout_columns(
+                        col_widths = c(6, 6),
+                        div(class = "mm-card mm-framed", leafletOutput("plant_map", height = 380)),
+                        div(class = "mm-card mm-framed", plotlyOutput("growth_trend_agg", height = 380))
                     )
-                ),
-                bslib::layout_columns(
-                    col_widths = c(4, 4, 4),
-                    div(class = "mm-card mm-framed", plotlyOutput("growth_plot", height = "300px")),
-                    div(class = "mm-card mm-framed", plotlyOutput("species_counts", height = "300px")),
-                    div(class = "mm-card mm-framed", plotlyOutput("humidity_growth", height = "300px"))
-                ),
-                br(),
-                bslib::layout_columns(
-                    col_widths = c(6, 6),
-                    div(class = "mm-card mm-framed", leafletOutput("plant_map", height = 380)),
-                    div(class = "mm-card mm-framed", plotlyOutput("growth_trend_agg", height = 380))
                 )
+            ),
+            tags$div(
+                class = "mm-page-footer site-footer",
+                tags$span(class = "site-footer-left", HTML("&copy; Alejandro Ines 2025")),
+                tags$span(class = "site-footer-right", "Made with Shiny for R")
             )
         )
     ),
@@ -138,25 +149,37 @@ ui <- bslib::page_navbar(
     bslib::nav_panel(
         title = "☀️ Climate Explorer",
         div(
-            class = "page-bg-climateexplorer",
-            bslib::layout_columns(
-                col_widths = c(4, 4, 4),
-                div(
-                    class = "mm-card mm-framed",
-                    p("Select a plant or climate point to view its time series:", class = "mm-card-title"),
-                    selectInput("location_selector", NULL, choices = c("All"), selected = "All"),
-                    div(style = "margin-bottom:12px;"),
-                    plotlyOutput("climate_plot", height = "320px"),
-                    div(style = "height:12px;"),
-                    plotlyOutput("temp_ts", height = "220px")
-                ),
-                div(class = "mm-card mm-framed", plotlyOutput("monthly_precip", height = "320px")),
-                div(
-                    class = "mm-card mm-framed",
-                    plotlyOutput("climate_point_ts", height = "260px"),
-                    div(style = "height:12px;"),
-                    plotlyOutput("growth_ts", height = "200px")
+            class = "mm-page-wrapper page-bg-climateexplorer",
+            div(
+                class = "mm-page-content",
+                bslib::layout_sidebar(
+                    sidebar = bslib::sidebar(
+                        open = TRUE,
+                        div(
+                            class = "mm-card mm-framed mm-no-expand",
+                                            h4("Select a plant", class = "mm-card-title"),
+                            selectInput("location_selector", NULL, choices = c("All"), selected = "All"),
+                            p("Choose a specific plant to view plant-level climate, or 'All' for aggregated views.", class = "direction-text")
+                        )
+                    ),
+                    bslib::layout_columns(
+                        col_widths = c(4, 4, 4),
+                        div(class = "mm-card mm-framed", plotlyOutput("climate_plot", height = "320px")),
+                        div(class = "mm-card mm-framed", plotlyOutput("monthly_precip", height = "320px")),
+                        div(class = "mm-card mm-framed", plotlyOutput("temp_distribution", height = "260px"))
+                    ),
+                    br(),
+                    bslib::layout_columns(
+                        col_widths = c(6, 6),
+                        div(class = "mm-card mm-framed", plotlyOutput("climate_point_ts", height = "380px")),
+                        div(class = "mm-card mm-framed", plotlyOutput("growth_ts", height = "380px"))
+                    )
                 )
+            ),
+            tags$div(
+                class = "mm-page-footer site-footer",
+                tags$span(class = "site-footer-left", HTML("&copy; Alejandro Ines 2025")),
+                tags$span(class = "site-footer-right", "Made with Shiny for R")
             )
         )
     ),
@@ -164,7 +187,15 @@ ui <- bslib::page_navbar(
     # DATA TABLE
     bslib::nav_panel(
         title = "📊 Data Table",
-        div(class = "page-bg-datatable", div(class = "mm-card mm-framed mm-no-expand", DTOutput("data_table")))
+        div(
+            class = "mm-page-wrapper page-bg-datatable",
+            div(class = "mm-page-content", div(class = "mm-card mm-framed mm-no-expand", DTOutput("data_table"))),
+            tags$div(
+                class = "mm-page-footer site-footer",
+                tags$span(class = "site-footer-left", HTML("&copy; Alejandro Ines 2025")),
+                tags$span(class = "site-footer-right", "Made with Shiny for R")
+            )
+        )
     )
 )
 
@@ -223,6 +254,11 @@ server <- function(input, output, session) {
         plot_temp_timeseries(data$air)
     })
 
+    # Temperature distribution for the climate explorer (new panel)
+    output$temp_distribution <- renderPlotly({
+        plot_temp_distribution(data$air)
+    })
+
     # populate location selector choices with plant ids and climate point labels
     observe({
         # Build a named list: label -> value. "All" maps to "All".
@@ -264,8 +300,9 @@ server <- function(input, output, session) {
     output$climate_point_ts <- renderPlotly({
         sel <- input$location_selector
         if (is.null(sel) || sel == "All") {
-            # show aggregated air timeseries
-            plot_climate_trend(data$air)
+            # when 'All' is selected we keep this card showing a richer aggregated
+            # time-series for climate (monthly / temp trends)
+            plot_temp_timeseries(data$air)
         } else {
             id <- as.numeric(sel)
             plot_climate_point_timeseries(data$plants_climate, id_col = "plant_id", id = id)
