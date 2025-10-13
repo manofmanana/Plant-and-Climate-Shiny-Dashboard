@@ -12,6 +12,8 @@
   --mint-glow: #88C9BF;           /* Cool cyan glow */
   --text-light: #E9F2E2;          /* Light text */
   --text-subtle: #CDE1C3;         /* Subtle neutral text */
+  /* Base responsive font size: scales between 14px and 18px depending on viewport */
+  --base-font: clamp(14px, 1.4vw + 12px, 18px);
   --bg-dark: linear-gradient(180deg, #1E3029 0%, #0E1815 100%);
   --glass-border: rgba(255, 255, 255, 0.1);
   --shadow-deep: 0 0 40px rgba(227, 197, 103, 0.15);
@@ -25,6 +27,8 @@ body, html {
   background: var(--bg-dark) fixed;
   color: var(--text-light);
   font-family: var(--font-main);
+  /* use the responsive base font */
+  font-size: var(--base-font);
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -41,12 +45,16 @@ body, html {
   color: var(--text-light) !important;
   font-weight: 500;
   transition: all 0.3s ease;
+  /* tighter tab spacing for a cleaner look */
+  padding: 6px 10px !important;
+  border-radius: 6px;
 }
 
 .nav-link.active {
   background-color: rgba(227, 197, 103, 0.25) !important;
-  border-radius: 10px;
+  border-radius: 6px !important;
   color: var(--gold-solar) !important;
+  padding: 6px 10px !important;
 }
 
 /* ===== Hero Section (Home Page) ===== */
@@ -422,10 +430,13 @@ label, .control-label, .form-label,
   justify-content: center;
   width: 100%;
   box-sizing: border-box;
-  /* Increase these so charts are more visible in normal (non-expanded) view */
-  min-height: 320px;
+  /* Fluid min-height so graphs look good on all devices */
+  min-height: clamp(220px, 30vh, 480px);
   transition: box-shadow 260ms ease, width 260ms ease, height 260ms ease;
 }
+
+/* Ensure inner plot container takes full width/height of the flex parent */
+.mm-card .plotly .plotly-graph-div { width: 100% !important; height: 100% !important; }
 
 /* Container when expanded — fixed, full-viewport, elevated */
 .expanded-widget {
