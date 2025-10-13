@@ -354,6 +354,34 @@ label, .control-label, .form-label,
   .mm-hero { background-size: cover !important; }
 }
 
+/* Mobile-first responsive adjustments */
+@media (max-width: 600px) {
+  /* Stack the layout columns into a single column for narrow screens */
+  .bs-layout-columns, .mm-feature-row, .mm-page-content > .row, .mm-page-content > .container {
+    display: block !important;
+  }
+
+  /* Make sidebar full width above content (so selector is easy to reach) */
+  .mm-page-wrapper .sidebar, .mm-card.mm-framed.mm-no-expand {
+    width: 100% !important;
+    margin-bottom: 10px;
+  }
+
+  /* Reduce plot min-height on small screens to avoid overflow while remaining visible */
+  .mm-card .plotly,
+  .mm-card .leaflet-container {
+    min-height: 220px;
+  }
+
+  /* Slightly reduce card padding and font sizes so content fits */
+  .mm-card { padding: 14px; }
+  .mm-card h4 { font-size: 1.05rem; }
+  .mm-hero { padding: 36px 18px; }
+
+  /* Ensure page wrapper min-height doesn't force unnecessary scroll on tiny screens */
+  .mm-page-wrapper { min-height: auto; }
+}
+
 /* additional responsive tweaks for glyphs and spacing */
 @media (max-width: 480px) {
   .mm-feature h4 { padding-left: 44px; }

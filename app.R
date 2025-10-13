@@ -50,6 +50,8 @@ ui <- bslib::page_navbar(
     window_title = "Maquerina Mundo — Solarpunk Dashboard",
     header = tags$head(
         tags$link(rel = "stylesheet", href = "style.css"),
+        # Ensure correct scaling on mobile devices
+        tags$meta(name = "viewport", content = "width=device-width, initial-scale=1"),
         tags$link(rel = "icon", type = "image/jpeg", href = "favicon.jpg"),
         tags$script(src = "expand.js")
     ),
