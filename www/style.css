@@ -380,6 +380,19 @@ label, .control-label, .form-label,
 
   /* Ensure page wrapper min-height doesn't force unnecessary scroll on tiny screens */
   .mm-page-wrapper { min-height: auto; }
+
+  /* Make footer text smaller and reduce padding on small screens so it doesn't dominate the viewport */
+  .site-footer {
+    font-size: 0.82rem !important;
+    padding: 8px 12px !important;
+  }
+  .site-footer-left, .site-footer-right {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-size: 0.82rem !important;
+    margin: 0;
+  }
 }
 
 /* additional responsive tweaks for glyphs and spacing */
