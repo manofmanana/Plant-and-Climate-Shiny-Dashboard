@@ -68,13 +68,15 @@ body, html {
 .mm-hero h1 {
   color: var(--gold-solar);
   font-weight: 700;
-  font-size: 2.4rem;
+  /* Use a fluid font size that grows on larger screens but reduces on small devices */
+  font-size: clamp(1.4rem, 2.2vw + 1.2rem, 2.8rem);
   letter-spacing: 0.3px;
 }
 
 .mm-sub {
   color: var(--text-subtle);
-  font-size: 1.1rem;
+  /* fluid subtitle sizing */
+  font-size: clamp(0.95rem, 1.4vw + 0.6rem, 1.2rem);
   line-height: 1.6;
   max-width: 700px;
   margin: 0 auto 15px;
@@ -96,7 +98,7 @@ body, html {
   font-family: 'Georgia', 'Times New Roman', serif;
   font-style: italic;
   color: #FFFDF8;
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 1.6vw + 0.6rem, 1.4rem);
   max-width: 820px;
   line-height: 1.3;
   margin: 10px auto 0 auto;
@@ -245,6 +247,11 @@ body, html {
   padding-left: 6px;
   padding-right: 6px;
 }
+
+/* Card/body text scaling: keep readable on mobile but slightly smaller */
+.mm-card h4 { font-size: clamp(1rem, 1.2vw + 0.8rem, 1.25rem); }
+.mm-card p { font-size: clamp(0.9rem, 1vw + 0.6rem, 1rem); }
+.mm-btn { font-size: clamp(0.85rem, 1vw + 0.5rem, 0.95rem); }
 
 /* Sidebar label style to match the correlation text color */
 .mm-sidebar-label {
