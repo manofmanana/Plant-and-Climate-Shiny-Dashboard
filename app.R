@@ -157,7 +157,7 @@ ui <- bslib::page_navbar(
                         open = TRUE,
                         div(
                             class = "mm-card mm-framed mm-no-expand",
-                                            h4("Select a plant", class = "mm-card-title"),
+                            h4("Select a plant", class = "mm-card-title"),
                             selectInput("location_selector", NULL, choices = c("All"), selected = "All"),
                             p("Choose a specific plant to view plant-level climate, or 'All' for aggregated views.", class = "direction-text")
                         )

@@ -286,3 +286,21 @@ plot_temp_timeseries <- function(air) {
         plotly::layout(margin = list(l = 12, r = 12, t = 28, b = 16)) %>%
         plotly::config(displayModeBar = FALSE)
 }
+
+# New: Temperature distribution histogram for the climate explorer
+plot_temp_distribution <- function(air) {
+    if (is.list(air) && !is.data.frame(air) && "air" %in% names(air)) air <- air$air
+    if (is.null(air) || nrow(air) == 0 || !"Temperature" %in% names(air)) {
+        p <- ggplot() +
+            labs(title = "No temperature data available")
+        return(ggplotly(p))
+    }
+    df <- air %>% dplyr::filter(!is.na(Temperature))
+    p <- ggplot(df, aes(x = Temperature)) +
+        geom_histogram(bins = 30, fill = "#E3C567", color = "white", alpha = 0.95) +
+        theme_minimal() +
+        labs(title = "Distribution of Temperature", x = "Temperature (°C)", y = "Count")
+    ggplotly(p) %>%
+        plotly::layout(margin = list(l = 12, r = 12, t = 28, b = 16)) %>%
+        plotly::config(displayModeBar = FALSE)
+}
