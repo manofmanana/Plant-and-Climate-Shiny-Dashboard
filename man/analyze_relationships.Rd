@@ -15,7 +15,7 @@ analyze_relationships(air, plants)
 \value{
 A list with two elements:
 \item{summary}{A data frame of plant observations with an added \code{adjusted_growth} column and category labels.}
-\item{ozone_temp_cor}{Numeric correlation between ozone and temperature in the provided \code{air} data frame.}
+\item{climate_corr}{Numeric correlation between Temperature and another available climate variable in the provided \code{air} data frame.}
 }
 \examples{
 ## Example use with internally generated data
