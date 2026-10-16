@@ -12,7 +12,12 @@ clean_species <- function(x) {
     m <- regmatches(x, regexpr("[A-Z][a-z]+ [a-z][a-z-]+", x))
     out <- x
     out[grepl("[A-Z][a-z]+ [a-z][a-z-]+", x)] <- m
-    aliases <- c("ZZ plant" = "Zamioculcas zamiifolia")
+    # GBIF reports some records under newer accepted names; keep the familiar ones.
+    aliases <- c(
+        "ZZ plant" = "Zamioculcas zamiifolia",
+        "Goeppertia orbifolia" = "Calathea orbifolia",
+        "Dracaena trifasciata" = "Sansevieria trifasciata"
+    )
     hit <- out %in% names(aliases)
     out[hit] <- aliases[out[hit]]
     out

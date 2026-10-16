@@ -14,7 +14,7 @@ if ("--plants" %in% args) {
         "Monstera deliciosa", "Epipremnum aureum", "Spathiphyllum wallisii",
         "Calathea orbifolia", "Dracaena fragrans", "Ficus lyrata",
         "Philodendron hederaceum", "Sansevieria trifasciata", "Zamioculcas zamiifolia"
-    ), per_species = 80)
+    ), per_species = 80, year = paste(as.integer(format(Sys.Date(), "%Y")) - 1, format(Sys.Date(), "%Y"), sep = ","))
 }
 
 source("scripts/fetch_climate_openmeteo.R")

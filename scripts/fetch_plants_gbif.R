@@ -6,12 +6,12 @@ library(rgbif)
 library(dplyr)
 library(lubridate)
 
-fetch_plants <- function(species_vec, per_species = 100, out = "data/indoor_plants.csv", country = NULL) {
+fetch_plants <- function(species_vec, per_species = 100, out = "data/indoor_plants.csv", country = NULL, year = NULL) {
     rows <- list()
     for (sp in species_vec) {
         message("Querying GBIF for ", sp)
         occ <- tryCatch(
-            occ_search(scientificName = sp, hasCoordinate = TRUE, limit = per_species, country = country),
+            occ_search(scientificName = sp, hasCoordinate = TRUE, limit = per_species, country = country, year = year),
             error = function(e) {
                 message("GBIF query error for ", sp, ": ", e$message)
                 return(NULL)

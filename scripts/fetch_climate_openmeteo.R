@@ -26,7 +26,7 @@ OPENMETEO_VARS <- c(
 )
 
 #' Daily climate for one location and date range.
-openmeteo_daily <- function(lat, lon, start_date, end_date, retries = 3) {
+openmeteo_daily <- function(lat, lon, start_date, end_date, retries = 5) {
     url <- sprintf(
         "%s?latitude=%.5f&longitude=%.5f&start_date=%s&end_date=%s&daily=%s&timezone=UTC",
         OPENMETEO_URL, lat, lon, start_date, end_date, paste(OPENMETEO_VARS, collapse = ",")
@@ -35,7 +35,7 @@ openmeteo_daily <- function(lat, lon, start_date, end_date, retries = 3) {
         res <- tryCatch(jsonlite::fromJSON(url), error = function(e) e)
         if (!inherits(res, "error")) break
         message("  retry ", attempt, " for ", lat, ",", lon, ": ", conditionMessage(res))
-        Sys.sleep(2 * attempt)
+        Sys.sleep(20 * attempt) # the archive API limits requests per minute, weighted by span
     }
     if (inherits(res, "error") || is.null(res$daily)) {
         return(NULL)
@@ -65,6 +65,8 @@ fetch_site_climate <- function(points_csv = "data/points_for_climate.csv",
     })
     out_df <- dplyr::bind_rows(rows)
     if (nrow(out_df) == 0) stop("No climate rows retrieved.")
+    n_missing <- nrow(pts) - length(unique(out_df$site_id))
+    if (n_missing > 0) warning(n_missing, " of ", nrow(pts), " sites failed to download; rerun to fill them in.")
     write.csv(out_df, out, row.names = FALSE)
     message("Wrote ", out, " (", nrow(out_df), " rows, ", length(unique(out_df$site_id)), " sites).")
     invisible(out_df)

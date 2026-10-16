@@ -26,8 +26,8 @@ It grew out of a love for plants, hiking and the outdoors, and a wish to make cl
 ![Plant Growth Dashboard](docs/plant-dashboard.webp)
 
 **☀️ Climate Explorer**
-- **Overview:** daily, weekly and monthly climate averaged over 30 reference sites (Jan 2021 – Sep 2025)
-- **Single plant:** pick any of the 246 observations to see the temperature it experienced (with the species' ideal range shaded), rain and humidity in the same window, and how it compares to every other plant of its species
+- **Overview:** daily, weekly and monthly climate averaged over 30 reference sites (Jan 2021 – Oct 2026)
+- **Single plant:** pick any of the 593 observations to see the temperature it experienced (with the species' ideal range shaded), rain and humidity in the same window, and how it compares to every other plant of its species
 
 ![Climate Explorer with one plant selected](docs/climate-explorer.webp)
 
@@ -39,9 +39,9 @@ Every chart has an **expand** button for a full-screen view (close with ✕, Esc
 
 | Dataset | Source | Contents |
 |---|---|---|
-| `data/indoor_plants.csv` | [GBIF](https://www.gbif.org/) occurrence records | 246 observations of 9 houseplant species in 45 countries, Jan 2024 – Sep 2025 |
+| `data/indoor_plants.csv` | [GBIF](https://www.gbif.org/) occurrence records | 593 observations of 9 houseplant species in 63 countries, Jan 2025 – Oct 2026 |
 | `data/plant_climate_daily.csv` | [Open-Meteo](https://open-meteo.com/) historical archive | Daily weather at each plant's location for the 30 days up to its observation date |
-| `data/climate_data.csv` | Open-Meteo | Daily weather at 30 reference sites, 2021 – Sep 2025 |
+| `data/climate_data.csv` | Open-Meteo | Daily weather at 30 reference sites, 2021 – Oct 2026 |
 | `data/points_for_climate.csv` | — | Coordinates of the reference sites |
 
 Weather variables: mean/min/max temperature, precipitation, wind, relative humidity and solar (shortwave) radiation.
