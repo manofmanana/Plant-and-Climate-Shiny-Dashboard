@@ -1,5 +1,16 @@
+# R
 .Rhistory
-.Rproj.user
-.DS_Store
+.RData
+.Rproj.user/
+.Renviron
 rsconnect/
 
+# Test artefacts
+tests/testthat/_snaps/**/*.new.png
+tests/testthat/_snaps/**/*.new.json
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

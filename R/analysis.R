@@ -1,65 +1,51 @@
 # R/analysis.R
-# Purpose: Analyze climate and plant growth relationships
+# Summaries that relate climate to the modeled growth index.
 
-library(tidyverse)
-
-analyze_relationships <- function(air, plants) {
-    # If the user accidentally passed a load_data() list as either argument,
-    # extract the appropriate element.
-    if (is.list(air) && "air" %in% names(air)) air <- air$air
-    if (is.list(plants) && "plants" %in% names(plants)) plants <- plants$plants
-    # If plants is actually the full load_data list, support plants_climate
-    if (is.list(plants) && "plants_climate" %in% names(plants)) {
-        plants <- plants$plants
-        plants_climate <- plants$plants_climate
-    } else {
-        plants_climate <- NULL
+#' Filter plants by species ("All" keeps everything) and minimum humidity.
+filter_plants <- function(plants, species = "All", min_humidity = 0) {
+    out <- plants
+    if (!is.null(species) && nzchar(species) && species != "All") {
+        out <- out[out$species == species, , drop = FALSE]
     }
-
-    # Ensure plants is a data frame / tibble so dplyr verbs work
-    if (!is.data.frame(plants)) {
-        plants <- tryCatch(tibble::as_tibble(plants), error = function(e) as.data.frame(plants))
+    if (!is.null(min_humidity)) {
+        out <- out[!is.na(out$humidity) & out$humidity >= min_humidity, , drop = FALSE]
     }
-    # Create a summary dataset showing how climate might affect plant growth
-    # protect against missing columns
-    if (!("growth_rate" %in% names(plants))) plants$growth_rate <- 1
-    if (!("humidity" %in% names(plants))) plants$humidity <- 50
-    summary_df <- plants %>%
-        dplyr::mutate(
-            adjusted_growth = growth_rate * (humidity / 100),
-            category = ifelse(adjusted_growth > median(adjusted_growth, na.rm = TRUE), "Thriving", "Stable")
-        )
+    out
+}
 
-    # If plant-level climate was joined, attach climate features (Temperature/Precipitation/Wind)
-    if (!is.null(plants_climate) && nrow(plants_climate) > 0) {
-        # join on plant_id if present, otherwise try species + eventDate
-        if ("plant_id" %in% names(summary_df) && "plant_id" %in% names(plants_climate)) {
-            summary_df <- summary_df %>% dplyr::left_join(
-                plants_climate %>% dplyr::select(plant_id, Temperature, Precipitation, Wind),
-                by = "plant_id"
-            )
-        } else if ("eventDate" %in% names(summary_df) && "eventDate" %in% names(plants_climate)) {
-            summary_df <- summary_df %>% dplyr::left_join(
-                plants_climate %>% dplyr::select(eventDate, Temperature, Precipitation, Wind),
-                by = "eventDate"
-            )
+#' Correlation of the growth index with each climate driver.
+#'
+#' @return data.frame(variable, correlation, n)
+analyze_relationships <- function(plants) {
+    vars <- c(Temperature = "temperature", Humidity = "humidity", Radiation = "radiation", Precipitation = "precipitation")
+    rows <- lapply(names(vars), function(label) {
+        x <- plants[[vars[[label]]]]
+        ok <- stats::complete.cases(x, plants$growth_index)
+        r <- if (sum(ok) >= 3 && stats::sd(x[ok]) > 0 && stats::sd(plants$growth_index[ok]) > 0) {
+            stats::cor(x[ok], plants$growth_index[ok])
+        } else {
+            NA_real_
         }
-    }
+        data.frame(variable = label, correlation = r, n = sum(ok))
+    })
+    do.call(rbind, rows)
+}
 
-    # Air correlation summary — use available numeric climate variables
-    corr_val <- NA_real_
-    if (!is.null(air) && nrow(air) > 0) {
-        candidates <- intersect(c("Temperature", "Precipitation", "Wind"), names(air))
-        if (length(candidates) >= 2) {
-            # compute correlation matrix and return a small summary (mean of upper triangle)
-            cm <- cor(air[, candidates], use = "complete.obs")
-            # pick the correlation between Temperature and the first other variable
-            other <- setdiff(candidates, "Temperature")
-            if (length(other) >= 1 && "Temperature" %in% candidates) {
-                corr_val <- cm["Temperature", other[1]]
-            }
-        }
+#' One-line description of a correlation, e.g. "strong positive (r = 0.71)".
+describe_correlation <- function(r) {
+    if (is.na(r)) {
+        return("not enough data")
     }
+    strength <- if (abs(r) >= 0.6) "strong" else if (abs(r) >= 0.3) "moderate" else "weak"
+    direction <- if (r >= 0) "positive" else "negative"
+    sprintf("%s %s (r = %.2f)", strength, direction, r)
+}
 
-    list(summary = summary_df, climate_corr = corr_val)
+#' Plain-text correlation between two columns of a data frame.
+cor_summary <- function(df, var1, var2) {
+    if (!(var1 %in% names(df)) || !(var2 %in% names(df))) {
+        return(paste0("One or both variables not found: ", var1, ", ", var2))
+    }
+    r <- stats::cor(df[[var1]], df[[var2]], use = "complete.obs")
+    paste0("Correlation between ", var1, " and ", var2, ": ", round(r, 2))
 }

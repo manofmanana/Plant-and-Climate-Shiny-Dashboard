@@ -1,62 +1,101 @@
 # scripts/fetch_climate_openmeteo.R
-# Fetch daily aggregated climate data from Open-Meteo for a set of lat/lon points
-# Dependencies: httr, jsonlite, dplyr, purrr, lubridate
+# Fetch daily climate from the Open-Meteo historical archive (free, no API key).
+#
+#   fetch_site_climate()  -> data/climate_data.csv
+#       Long daily series for the reference sites in data/points_for_climate.csv
+#       (used by the Climate Explorer's "All sites" views).
+#   fetch_plant_climate() -> data/plant_climate_daily.csv
+#       The 30 days of weather at each plant's location leading up to the date it
+#       was observed (used for per-plant climate and the modeled growth index).
+#
+# Usage (from the project root):
+#   source("scripts/fetch_climate_openmeteo.R")
+#   fetch_site_climate()
+#   fetch_plant_climate()
+#
+# Dependencies: jsonlite, dplyr
 
-library(httr)
 library(jsonlite)
 library(dplyr)
-library(purrr)
-library(lubridate)
 
-openmeteo_daily_for_point <- function(lat, lon, start_date, end_date, timezone = "UTC") {
-    base <- "https://archive-api.open-meteo.com/v1/archive"
-    params <- list(
-        latitude = lat,
-        longitude = lon,
-        start_date = start_date,
-        end_date = end_date,
-        timezone = timezone,
-        daily = paste(c(
-            "temperature_2m_max", "temperature_2m_min", "temperature_2m_mean",
-            "precipitation_sum", "windspeed_10m_mean"
-        ), collapse = ",")
+OPENMETEO_URL <- "https://archive-api.open-meteo.com/v1/archive"
+OPENMETEO_VARS <- c(
+    "temperature_2m_mean", "temperature_2m_max", "temperature_2m_min",
+    "precipitation_sum", "wind_speed_10m_mean", "relative_humidity_2m_mean",
+    "shortwave_radiation_sum"
+)
+
+#' Daily climate for one location and date range.
+openmeteo_daily <- function(lat, lon, start_date, end_date, retries = 3) {
+    url <- sprintf(
+        "%s?latitude=%.5f&longitude=%.5f&start_date=%s&end_date=%s&daily=%s&timezone=UTC",
+        OPENMETEO_URL, lat, lon, start_date, end_date, paste(OPENMETEO_VARS, collapse = ",")
     )
-    res <- httr::GET(base, query = params)
-    stop_for_status(res)
-    json <- content(res, as = "text", encoding = "UTF-8")
-    dat <- fromJSON(json, flatten = TRUE)
-    if (is.null(dat$daily)) {
+    for (attempt in seq_len(retries)) {
+        res <- tryCatch(jsonlite::fromJSON(url), error = function(e) e)
+        if (!inherits(res, "error")) break
+        message("  retry ", attempt, " for ", lat, ",", lon, ": ", conditionMessage(res))
+        Sys.sleep(2 * attempt)
+    }
+    if (inherits(res, "error") || is.null(res$daily)) {
         return(NULL)
     }
-    df <- as_tibble(dat$daily)
-    # dat$daily typically has a 'time' column
-    df <- df %>%
-        mutate(date = as.Date(time), latitude = lat, longitude = lon, source = "Open-Meteo") %>%
-        select(date, latitude, longitude, everything(), -time)
-    df
+    daily <- as.data.frame(res$daily, stringsAsFactors = FALSE)
+    daily$date <- as.Date(daily$time)
+    daily$time <- NULL
+    daily$latitude <- lat
+    daily$longitude <- lon
+    daily[, c("date", "latitude", "longitude", OPENMETEO_VARS)]
 }
 
-fetch_climate <- function(points_df, start_date, end_date, out = "data/climate_data.csv") {
-    rows <- pmap_dfr(
-        list(points_df$latitude, points_df$longitude),
-        function(lat, lon) {
-            Sys.sleep(0.25)
-            df <- tryCatch(openmeteo_daily_for_point(lat, lon, start_date, end_date),
-                error = function(e) {
-                    message("error fetching for ", lat, ",", lon, ": ", e$message)
-                    NULL
-                }
-            )
-            if (!is.null(df)) {
-                df$id <- paste0("p_", gsub("\\.", "", sprintf("%.4f_%.4f", lat, lon)))
-                df
-            } else {
-                tibble()
-            }
+site_id <- function(lat, lon) sprintf("site_%.3f_%.3f", lat, lon)
+
+#' Long daily series for each reference site.
+fetch_site_climate <- function(points_csv = "data/points_for_climate.csv",
+                               start_date = "2021-01-01",
+                               end_date = Sys.Date() - 7,
+                               out = "data/climate_data.csv") {
+    pts <- read.csv(points_csv)
+    rows <- lapply(seq_len(nrow(pts)), function(i) {
+        message(sprintf("[%d/%d] site %.3f, %.3f", i, nrow(pts), pts$latitude[i], pts$longitude[i]))
+        Sys.sleep(0.3)
+        df <- openmeteo_daily(pts$latitude[i], pts$longitude[i], start_date, end_date)
+        if (!is.null(df)) df$site_id <- site_id(pts$latitude[i], pts$longitude[i])
+        df
+    })
+    out_df <- dplyr::bind_rows(rows)
+    if (nrow(out_df) == 0) stop("No climate rows retrieved.")
+    write.csv(out_df, out, row.names = FALSE)
+    message("Wrote ", out, " (", nrow(out_df), " rows, ", length(unique(out_df$site_id)), " sites).")
+    invisible(out_df)
+}
+
+#' Weather at each plant's location for the `window_days` before it was observed.
+fetch_plant_climate <- function(plants_csv = "data/indoor_plants.csv",
+                                window_days = 30,
+                                out = "data/plant_climate_daily.csv") {
+    plants <- read.csv(plants_csv, stringsAsFactors = FALSE)
+    plants$obs_date <- as.Date(substr(plants$eventDate, 1, 10))
+    plants <- plants[!is.na(plants$obs_date) & !is.na(plants$decimalLatitude), ]
+    rows <- lapply(seq_len(nrow(plants)), function(i) {
+        p <- plants[i, ]
+        if (i %% 25 == 1) message(sprintf("[%d/%d] plants", i, nrow(plants)))
+        Sys.sleep(0.15)
+        df <- openmeteo_daily(
+            p$decimalLatitude, p$decimalLongitude,
+            format(p$obs_date - (window_days - 1)), format(p$obs_date)
+        )
+        if (is.null(df)) {
+            message("  no data for ", p$occurrence_id)
+            return(NULL)
         }
-    )
-    if (nrow(rows) == 0) stop("No climate rows retrieved.")
-    write.csv(rows, out, row.names = FALSE)
-    message("Wrote ", out, " (", nrow(rows), " rows).")
-    invisible(rows)
+        df$occurrence_id <- p$occurrence_id
+        df
+    })
+    out_df <- dplyr::bind_rows(rows)
+    if (nrow(out_df) == 0) stop("No plant climate rows retrieved.")
+    out_df <- out_df[, c("occurrence_id", setdiff(names(out_df), "occurrence_id"))]
+    write.csv(out_df, out, row.names = FALSE)
+    message("Wrote ", out, " (", nrow(out_df), " rows, ", length(unique(out_df$occurrence_id)), " plants).")
+    invisible(out_df)
 }

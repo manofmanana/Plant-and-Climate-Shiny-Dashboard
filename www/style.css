@@ -23,7 +23,7 @@
 
 /* ===== Base ===== */
 body, html {
-  height: 100%;
+  min-height: 100%;
   background: var(--bg-dark) fixed;
   color: var(--text-light);
   font-family: var(--font-main);
@@ -31,7 +31,7 @@ body, html {
   font-size: var(--base-font);
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* ===== Navbar ===== */
@@ -69,8 +69,14 @@ body, html {
               rgba(30, 48, 41, 0.6),
               rgba(14, 24, 21, 0.85)
             ),
-            url("solar.JPG") center/35% no-repeat;
+            url("solar.webp") center/cover no-repeat;
   border: 2px solid var(--gold-solar);
+}
+
+.mm-hero-lead {
+  font-size: clamp(0.95rem, 1.2vw + 0.6rem, 1.15rem);
+  max-width: 720px;
+  margin: 0 auto 15px;
 }
 
 .mm-hero h1 {
@@ -81,25 +87,6 @@ body, html {
   letter-spacing: 0.3px;
 }
 
-.mm-sub {
-  color: var(--text-subtle);
-  /* fluid subtitle sizing */
-  font-size: clamp(0.95rem, 1.4vw + 0.6rem, 1.2rem);
-  line-height: 1.6;
-  max-width: 700px;
-  margin: 0 auto 15px;
-  box-shadow: 0 0 60px rgba(227, 197, 103, 0.15);
-  background: linear-gradient(
-              rgba(30, 48, 41, 0.6),
-              rgba(14, 24, 21, 0.85)
-            ),
-            url("solar.JPG") center/cover no-repeat;
-  /* make the hero background appear more zoomed-out on larger screens */
-  background-size: 35% !important;
-  background-position: center center !important;
-  align-items: center;
-  justify-content: center;
-}
 
 /* Modern, editorial hero quote — no boxed container */
 .mm-hero-quote-text {
@@ -163,6 +150,7 @@ body, html {
 
 /* ===== Cards & Boxes ===== */
 .mm-card {
+  position: relative;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--glass-border);
   border-radius: 18px;
@@ -173,9 +161,11 @@ body, html {
 }
 
 .mm-card:hover {
-  transform: translateY(-4px);
   box-shadow: 0 0 25px rgba(227, 197, 103, 0.25);
 }
+
+/* Only the link cards on the home page lift on hover; chart cards stay put. */
+.mm-feature:hover { transform: translateY(-4px); }
 
 /* Modern select styling */
 .shiny-input-container .selectize-input,
@@ -193,22 +183,6 @@ body, html {
   outline: none;
   border-color: var(--green-leaf);
   box-shadow: 0 8px 26px rgba(107,191,143,0.14);
-}
-
-/* Add safe spacing between stacked plot outputs and enforce a min height so they don't collapse */
-.mm-card .plotly, .mm-card .leaflet-container {
-  margin-bottom: 12px;
-  min-height: 140px;
-}
-
-/* Modern plot tooltip and title tweaks */
-.plotly .modebar, .plotly .legend {
-  border-radius: 8px;
-}
-
-/* give charts a subtle inner glow */
-.plotly, .leaflet-container {
-  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));
 }
 
 /* Gold frame highlight */
@@ -305,14 +279,6 @@ label, .control-label, .form-label,
   background: var(--gold-solar) !important;
 }
 
-/* ===== Plotly, Leaflet, and Data Table Borders ===== */
-.plotly, .leaflet-container, .dataTables_wrapper {
-  border: 2px solid var(--gold-solar) !important;
-  border-radius: 14px;
-  box-shadow: 0 0 18px rgba(227, 197, 103, 0.25);
-  overflow: hidden;
-}
-
 /* ===== Data Table Enhancements ===== */
 .dataTables_wrapper .dataTables_filter input {
   background: rgba(255, 255, 255, 0.08);
@@ -382,11 +348,6 @@ label, .control-label, .form-label,
     margin-bottom: 10px;
   }
 
-  /* Reduce plot min-height on small screens to avoid overflow while remaining visible */
-  .mm-card .plotly,
-  .mm-card .leaflet-container {
-    min-height: 220px;
-  }
 
   /* Slightly reduce card padding and font sizes so content fits */
   .mm-card { padding: 14px; }
@@ -417,35 +378,14 @@ label, .control-label, .form-label,
   .mm-hero { background-size: cover !important; background-position: center top !important; }
 }
 
-/* ===== Hover-expand widget behavior ===== */
-/* Center and enlarge internal graphs for normal view so they display prominently
-   inside each card rather than being scaled down. We make the plot wrappers
-   use flexbox to center the inner Plotly/Leaflet content and set a generous
-   min-height which can be overridden per-output if necessary. */
-.mm-card .plotly,
-.mm-card .plotly .plotly-graph-div,
-.mm-card .leaflet-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  box-sizing: border-box;
-  /* Fluid min-height so graphs look good on all devices */
-  min-height: clamp(220px, 30vh, 480px);
-  transition: box-shadow 260ms ease, width 260ms ease, height 260ms ease;
-}
-
-/* Ensure inner plot container takes full width/height of the flex parent */
-.mm-card .plotly .plotly-graph-div { width: 100% !important; height: 100% !important; }
-
 /* Container when expanded — fixed, full-viewport, elevated */
 .expanded-widget {
   /* center as a square that fits within the viewport */
   position: fixed !important;
   top: 50% !important;
   left: 50% !important;
-  width: min(92vw, 92vh) !important;
-  height: min(92vw, 92vh) !important;
+  width: min(94vw, 1400px) !important;
+  height: min(88vh, 900px) !important;
   transform: translate(-50%, -50%) !important;
   margin: 0 !important;
   padding: 12px !important;
@@ -461,7 +401,6 @@ label, .control-label, .form-label,
 
 /* Ensure Plotly / Leaflet children stretch to fill expanded square and are centered */
 .expanded-widget .plotly-graph-div,
-.expanded-widget .leaflet-pane,
 .expanded-widget .leaflet-container,
 .expanded-widget .html-widget {
   width: 100% !important;
@@ -476,7 +415,7 @@ label, .control-label, .form-label,
   justify-content: center !important;
 }
 
-/* Close button for expanded widgets */
+/* Legacy close button (kept for older markup) */
 .expanded-widget .expand-close {
   position: absolute;
   top: 10px;
@@ -498,8 +437,39 @@ label, .control-label, .form-label,
 
 /* overlay used when a card is expanded */
 .mm-expand-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(3px);
+  z-index: 99990;
 }
+body.mm-noscroll { overflow: hidden; }
+
+/* Expand / close button injected by expand.js */
+.mm-expand-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid rgba(227, 197, 103, 0.5);
+  background: rgba(14, 24, 21, 0.75);
+  color: var(--gold-solar);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
+.mm-expand-btn:hover, .mm-expand-btn:focus-visible { opacity: 1; background: rgba(227, 197, 103, 0.2); }
+.mm-expand-btn:focus-visible { outline: 2px solid var(--gold-solar); outline-offset: 2px; }
+.expanded-widget > .mm-expand-btn { top: 14px; right: 14px; }
+.expanded-widget > *:not(.mm-expand-btn) { width: 100%; height: 100%; }
 
 /* utility classes for image-backed transparent boxes */
 .mm-bg-nasa {
@@ -520,7 +490,7 @@ label, .control-label, .form-label,
   background-blend-mode: multiply;
 }
 .mm-bg-climate2 {
-  background-image: url('climate2.jpeg');
+  background-image: url('climate2.webp');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -580,15 +550,6 @@ label, .control-label, .form-label,
   box-shadow: 0 -4px 10px rgba(0,0,0,0.25);
 }
 
-/* Disable the previous hover-based scaling which made plots feel squished in
-   normal view. Keep a subtle shadow change only for hover to indicate
-   interactivity without affecting layout. */
-.mm-card .plotly:hover .plotly-graph-div,
-.mm-card .leaflet-container:hover {
-  transform: none !important;
-  box-shadow: 0 12px 34px rgba(0,0,0,0.18);
-}
-
 /* Direction/instruction text used inside panels */
 .direction-text {
   color: var(--text-subtle);
@@ -596,3 +557,63 @@ label, .control-label, .form-label,
   margin: 6px 0 12px 0;
   font-weight: 500;
 }
+
+/* ===== Brand, stats, facts, table (v2) ===== */
+.mm-brand { color: var(--gold-solar); font-weight: 700; letter-spacing: 0.3px; }
+
+.mm-stats-row { margin-top: 28px; }
+.mm-stat.bslib-value-box {
+  border: 1px solid rgba(227, 197, 103, 0.45) !important;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-soft);
+}
+.mm-stat .value-box-title { color: var(--text-subtle); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.6px; }
+.mm-stat .value-box-value { color: var(--gold-solar); font-size: clamp(1.3rem, 1.6vw + 0.8rem, 2rem); font-weight: 700; }
+.mm-stat .value-box-showcase { color: var(--green-leaf); }
+
+.mm-model-note p { text-align: left; color: var(--text-subtle); font-size: 0.9rem; }
+
+.mm-facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 10px 0 0; font-size: 0.9rem; }
+.mm-facts dt { color: var(--text-subtle); font-weight: 500; }
+.mm-facts dd { margin: 0; color: var(--text-light); }
+
+.site-footer a { color: var(--gold-solar); }
+
+.bslib-sidebar-layout > .sidebar { background: rgba(14, 24, 21, 0.55) !important; border-color: var(--glass-border) !important; }
+.bslib-sidebar-layout { background: transparent !important; border: none !important; }
+
+table.dataTable, table.dataTable td, table.dataTable th { color: var(--text-light) !important; }
+table.dataTable tbody tr { background: rgba(255, 255, 255, 0.02) !important; }
+table.dataTable.stripe tbody tr.odd { background: rgba(255, 255, 255, 0.05) !important; }
+.dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate .paginate_button { color: var(--text-subtle) !important; }
+.dataTables_wrapper .dt-buttons .dt-button {
+  border-radius: 10px; border: 1px solid rgba(227, 197, 103, 0.6); background: transparent; color: var(--gold-solar);
+}
+.dataTables_wrapper .dataTables_wrapper { border: none !important; box-shadow: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ===== Charts inside cards (v2) ===== */
+.mm-card { padding: 18px; }
+.mm-card .html-widget { width: 100% !important; }
+.mm-card .leaflet-container { border-radius: 12px; }
+/* Dark basemap from free OpenStreetMap tiles (no API key needed). */
+.leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.5); }
+.leaflet-container { background: #0E1815; }
+.leaflet-popup-content { color: #1E3029; }
+.leaflet-control-attribution { background: rgba(14,24,21,0.7) !important; color: var(--text-subtle) !important; }
+.leaflet-control-attribution a { color: var(--gold-solar) !important; }
+
+.mm-stat .value-box-value { overflow-wrap: normal; word-break: normal; font-size: clamp(1.1rem, 1.2vw + 0.7rem, 1.7rem) !important; }
+.mm-stat .value-box-area { padding: 14px 16px !important; }
+.mm-stat .value-box-showcase { font-size: 2rem; max-width: 3.2rem; }
+.mm-stat .value-box-showcase svg { width: 2.2rem !important; height: 2.2rem !important; }
+
+/* Room above each chart for the expand button, so it never covers a title. */
+.mm-card.mm-expandable { padding-top: 46px; }
+.mm-expandable > .mm-expand-btn { top: 8px; right: 10px; }
+.mm-btn, .mm-btn:hover, .site-footer a { text-decoration: none; }
+html { background-color: #0E1815; }

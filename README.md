@@ -1,92 +1,122 @@
-# Maquerina Mundo
+# ☀️ Maquerina Mundo — Plants Meet Climate
 
-Modeling the harmony between nature, climate, and machines.
+*Modeling the harmony between nature, climate, and machines.*
 
-Author: Alejandro (Alex) Ines
+[![CI](https://github.com/manofmanana/Plant-and-Climate-Shiny-Dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/manofmanana/Plant-and-Climate-Shiny-Dashboard/actions/workflows/ci.yml)
+![R](https://img.shields.io/badge/R-%E2%89%A54.1-276DC3)
+![Shiny](https://img.shields.io/badge/Shiny-bslib%205-6BBF8F)
+![License](https://img.shields.io/badge/license-MIT-E3C567)
 
-## Live demo https://www.youtube.com/watch?v=I6cCEDqALec
+**[Live app](https://manofmanana.shinyapps.io/maquerinamundo/)** · **[Video walkthrough](https://www.youtube.com/watch?v=I6cCEDqALec)**
 
-Try the live deployed app here:
+Maquerina Mundo is a solarpunk-inspired Shiny dashboard. It connects **where popular houseplant species are observed around the world** (GBIF) with **the real weather around each observation** (Open-Meteo), and asks a simple question: *how favourable was that climate for that plant?*
 
-[Maquerina Mundo — live demo](https://manofmanana.shinyapps.io/maquerinamundo/)
+It grew out of a love for plants, hiking and the outdoors, and a wish to make climate data feel accessible and hopeful.
 
-## Overview
+![Home page](docs/home.webp)
 
-Maquerina Mundo is a solarpunk-inspired Shiny dashboard that explores the relationships between climate variables and indoor plant health. The app combines climate data visualizations, spatial mapping of plant locations, and interactive controls to help users explore how temperature, humidity, solar radiation, and other factors correlate with plant growth.
+## What's inside
 
-The project was inspired by a personal love for plants, hiking, and the outdoors, and a desire to make climate data feel accessible and hopeful. It blends aesthetic design and data-first storytelling to encourage sustainable thinking.
+**🌱 Plant Growth Dashboard**
+- Filter by species and by minimum 30-day humidity; every chart, stat and the map update together
+- Growth index by species, humidity vs growth, and a *"what drives the growth index?"* correlation chart
+- World map of all observations, clustered and coloured by Thriving or Stable, with details in each popup
+- Monthly growth trend per species, and observation counts
 
-## Features
+![Plant Growth Dashboard](docs/plant-dashboard.webp)
 
-- Interactive climate trend plots and correlation heatmaps
-- Filterable plant growth dashboard with map and distribution plots
-- Data table browsing and export
-- Curated hero presentation with editorial quote
+**☀️ Climate Explorer**
+- **Overview:** daily, weekly and monthly climate averaged over 30 reference sites (Jan 2021 – Sep 2025)
+- **Single plant:** pick any of the 246 observations to see the temperature it experienced (with the species' ideal range shaded), rain and humidity in the same window, and how it compares to every other plant of its species
 
-## Local setup
+![Climate Explorer with one plant selected](docs/climate-explorer.webp)
 
-Prerequisites: R >= 4.0
+**📊 Data Table**: search, sort and filter every column, then download as CSV or Excel.
 
-1. From the repository root, install packages listed in `requirements.txt` (run inside R):
+Every chart has an **expand** button for a full-screen view (close with ✕, Escape, or a click outside).
 
-```r
-pkgs <- readLines('requirements.txt')
-install.packages(pkgs)
+## The data
+
+| Dataset | Source | Contents |
+|---|---|---|
+| `data/indoor_plants.csv` | [GBIF](https://www.gbif.org/) occurrence records | 246 observations of 9 houseplant species in 45 countries, Jan 2024 – Sep 2025 |
+| `data/plant_climate_daily.csv` | [Open-Meteo](https://open-meteo.com/) historical archive | Daily weather at each plant's location for the 30 days up to its observation date |
+| `data/climate_data.csv` | Open-Meteo | Daily weather at 30 reference sites, 2021 – Sep 2025 |
+| `data/points_for_climate.csv` | — | Coordinates of the reference sites |
+
+Weather variables: mean/min/max temperature, precipitation, wind, relative humidity and solar (shortwave) radiation.
+
+### About the growth index
+
+GBIF records **where and when** a plant was seen, not how fast it grew. So instead of inventing growth numbers, the app computes a transparent **modeled growth index (0–100)** in [`R/growth_model.R`](R/growth_model.R):
+
+```
+growth_index = 100 × temperature_score^0.5 × humidity_score^0.3 × light_score^0.2
 ```
 
-1. Run the Shiny app locally:
+Each score is 1 when the 30-day average sits inside that species' commonly cited care range (e.g. Monstera 20–29 °C, 60–80 % humidity), and falls linearly to 0 outside it. Light saturates at 15 MJ/m² per day. Plants at or above the median are labelled **Thriving**, the rest **Stable**.
+
+It's an illustrative model of *how favourable the local outdoor climate was*, not a measurement, and the app says so wherever it's shown. With the current data, temperature is the strongest driver (r ≈ 0.56), followed by sunlight (r ≈ 0.45).
+
+## Run it locally
+
+Requires R ≥ 4.1.
+
+```r
+# from the project folder, in R
+install.packages("pak")
+pak::local_install_deps()          # installs everything listed in DESCRIPTION
+shiny::runApp()
+```
+
+Or from a terminal: `Rscript -e "shiny::runApp(launch.browser = TRUE)"`.
+
+## Tests
 
 ```bash
-R -e "shiny::runApp('.', launch.browser = TRUE)"
+Rscript tests/testthat.R
 ```
 
-## Deploy to shinyapps.io (rsconnect)
+The suite covers data loading (deterministic and read-only), the growth model, the analysis helpers and every chart, including empty-data cases and HTML escaping in map popups. It also has an end-to-end test that starts the real app in headless Chrome with **shinytest2** and drives every tab. GitHub Actions runs it on every push.
 
-If you want to deploy the app to shinyapps.io, follow these steps locally. Do NOT commit your rsconnect token/secret to source control.
-
-1. Install `rsconnect`:
-
-```r
-install.packages('rsconnect')
-```
-
-1. Authorize your account (replace with your token/secret):
-
-```r
-rsconnect::setAccountInfo(name='YOUR_ACCOUNT_NAME',
-  token='YOUR_TOKEN',
-  secret='YOUR_SECRET')
-```
-
-1. Deploy from the project root:
-
-```r
-library(rsconnect)
-rsconnect::deployApp(appDir = '.', account = 'YOUR_ACCOUNT_NAME')
-```
-
-Or from the command line:
+## Refreshing the data
 
 ```bash
-Rscript -e "rsconnect::deployApp(appDir='.', account='YOUR_ACCOUNT_NAME')"
+Rscript scripts/build_data.R            # refresh climate for the current plants
+Rscript scripts/build_data.R --plants   # also re-download observations from GBIF
 ```
 
-## Files of interest
+Open-Meteo is free and needs no API key; the scripts space out requests to respect its rate limits.
 
-- `app.R` — main Shiny UI and server logic
-- `www/` — static assets (images, CSS, JS)
-- `R/` — helper scripts for data loading, analysis, and visualization
-- `data/` — CSV datasets used by the app
+## Deploy to shinyapps.io
 
-## Dependencies
+```r
+install.packages("rsconnect")
+rsconnect::setAccountInfo(name = "YOUR_ACCOUNT", token = "YOUR_TOKEN", secret = "YOUR_SECRET")  # once, never commit these
+rsconnect::deployApp(appName = "maquerinamundo")
+```
 
-See `requirements.txt` for R package dependencies used by the project.
+## Project structure
 
-## License & Credit
+```
+app.R                 UI + server
+R/
+  data_load.R         reads data/, cleans species names, joins plant climate
+  growth_model.R      species care ranges + modeled growth index
+  analysis.R          filters and correlations
+  plots.R             every chart and the map (plotly / leaflet)
+  helpers.R           cards, footer, formatting
+www/                  style.css, expand.js, images
+data/                 CSV datasets (see above)
+scripts/              data refresh: GBIF + Open-Meteo
+tests/testthat/       unit tests + shinytest2 end-to-end test
+docs/                 README screenshots
+```
 
-Author: Alejandro Ines. Please credit the author when reusing or adapting this work.
+## Built with
 
-## Contact
+Shiny · bslib (Bootstrap 5) · plotly · leaflet + OpenStreetMap · DT · dplyr · lubridate · testthat · shinytest2
 
-Open an issue or contact the author directly for collaboration.
+## License & credit
 
+MIT, see [LICENSE](LICENSE). Created by **Alejandro (Alex) Ines**; please credit the author when reusing or adapting this work. Plant occurrence data © GBIF contributors; weather data from Open-Meteo (CC BY 4.0); map tiles © OpenStreetMap contributors.

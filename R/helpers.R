@@ -1,20 +1,43 @@
 # R/helpers.R
-# Purpose: Utility functions used across app
+# Small utilities shared by the app and plots.
 
 scale01 <- function(x) {
-    (x - min(x, na.rm = TRUE)) / (max(x, na.rm = TRUE) - min(x, na.rm = TRUE))
-}
-
-# Format numeric values for pretty display
-format_num <- function(x, digits = 2) {
-    format(round(x, digits), nsmall = digits)
-}
-
-# Simple correlation helper
-cor_summary <- function(df, var1, var2) {
-    if (!(var1 %in% names(df)) || !(var2 %in% names(df))) {
-        return(paste0("One or both variables not found: ", var1, ", ", var2))
+    rng <- range(x, na.rm = TRUE)
+    if (diff(rng) == 0) {
+        return(ifelse(is.na(x), NA_real_, 0))
     }
-    cor_val <- cor(df[[var1]], df[[var2]], use = "complete.obs")
-    paste0("Correlation between ", var1, " and ", var2, ": ", round(cor_val, 2))
+    (x - rng[1]) / diff(rng)
+}
+
+format_num <- function(x, digits = 2) {
+    format(round(x, digits), nsmall = digits, big.mark = ",")
+}
+
+format_date_range <- function(rng) {
+    paste(format(rng[1], "%b %Y"), "–", format(rng[2], "%b %Y"))
+}
+
+#' Footer shown at the bottom of every page.
+site_footer <- function() {
+    shiny::tags$footer(
+        class = "mm-page-footer site-footer",
+        shiny::tags$span(class = "site-footer-left", shiny::HTML(paste0("&copy; Alejandro Ines ", format(Sys.Date(), "%Y")))),
+        shiny::tags$span(
+            class = "site-footer-right",
+            "Data: ",
+            shiny::tags$a(href = "https://www.gbif.org/", target = "_blank", rel = "noopener", "GBIF"),
+            " & ",
+            shiny::tags$a(href = "https://open-meteo.com/", target = "_blank", rel = "noopener", "Open-Meteo"),
+            " · Made with Shiny for R"
+        )
+    )
+}
+
+#' Card wrapper used for every chart; `expand = TRUE` adds the expand button.
+mm_card <- function(..., title = NULL, expand = TRUE, class = NULL) {
+    shiny::div(
+        class = paste("mm-card mm-framed", if (expand) "mm-expandable" else "mm-no-expand", class),
+        if (!is.null(title)) shiny::h4(title, class = "mm-card-title"),
+        ...
+    )
 }

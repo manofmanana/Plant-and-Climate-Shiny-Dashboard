@@ -1,19 +1,33 @@
 Package: MaquerinaMundo
-Type: Package
-Title: Maquerina Mundo — Solarpunk dashboard for plants and climate
-Version: 0.1.0
+Type: Project
+Title: Maquerina Mundo — Solarpunk Dashboard for Plants and Climate
+Version: 2.0.0
 Authors@R: person("Alejandro", "Ines", role = c("aut", "cre"))
-Description: Maquerina Mundo is a Shiny-based project and lightweight R package that explores
- relationships between plant growth and climate variables through interactive visualizations,
- mapping, and small analysis helpers. It bundles convenience functions for data loading,
- summary statistics, and plotting to support teaching, demos, and prototyping in a solarpunk
- aesthetic. This field intentionally provides a longer description to satisfy package
- metadata requirements and to give readers context about the project's goals and scope.
+Description: A Shiny dashboard that relates GBIF houseplant observations to the
+    real weather around each observation (Open-Meteo) through interactive charts,
+    a map, a climate explorer and a modeled growth index. This file lists the
+    app's dependencies so they can be installed with
+    pak::local_install_deps() or remotes::install_deps().
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
-Imports: shiny, bslib, tidyverse, plotly, leaflet, DT, showtext, ragg, htmltools, lubridate, scales, ggthemes, corrplot
-URL: https://example.com/maquerinamundo
-BugReports: https://example.com/maquerinamundo/issues
-Video: https://youtu.be/VIDEO_ID
-
+Depends: R (>= 4.1)
+Imports:
+    bsicons,
+    bslib (>= 0.6),
+    dplyr,
+    DT,
+    htmltools,
+    leaflet,
+    lubridate,
+    plotly,
+    shiny (>= 1.8)
+Suggests:
+    jsonlite,
+    lintr,
+    rgbif,
+    shinytest2,
+    testthat (>= 3.0.0)
+URL: https://manofmanana.shinyapps.io/maquerinamundo/,
+    https://github.com/manofmanana/Plant-and-Climate-Shiny-Dashboard
+BugReports: https://github.com/manofmanana/Plant-and-Climate-Shiny-Dashboard/issues
+Config/testthat/edition: 3

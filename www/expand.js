@@ -1,142 +1,114 @@
-// expand.js
-// Improved widget expansion: double-click to expand/collapse a .mm-card.
-// On expand: apply .expanded-widget and trigger precise Plotly relayout and resize.
-// On collapse: revert margins and resize smaller.
+// expand.js — full-screen view for chart cards.
+//
+// Every `.mm-expandable` card gets an expand button. Clicking it (or pressing
+// Enter/Space on it) opens the card in a centered overlay; the close button,
+// clicking the backdrop, or Escape closes it. Clicks inside charts and maps are
+// left alone so hovering, zooming and panning keep working.
+(function () {
+  "use strict";
 
-(function(){
-  function resizePlotly(el, expanded){
-    if (!el || typeof Plotly === 'undefined') return;
-    try {
-      // Plotly may be attached to a container or directly to the graph div
-      var graphDiv = el.querySelector ? el.querySelector('.plotly-graph-div') : el;
-      if (!graphDiv) return;
-      // first, resize to container
-      Plotly.Plots.resize(graphDiv);
-      // then adjust margins: fuller margins when expanded, tighter when collapsed
-      if (expanded) {
-        Plotly.relayout(graphDiv, { 'margin.l': 48, 'margin.r': 48, 'margin.t': 48, 'margin.b': 48 });
-      } else {
-        Plotly.relayout(graphDiv, { 'margin.l': 36, 'margin.r': 18, 'margin.t': 18, 'margin.b': 18 });
+  var ICON_EXPAND =
+    '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M1.5 1h4a.5.5 0 0 1 0 1H2.7l3.6 3.6a.5.5 0 1 1-.7.7L2 2.7v2.8a.5.5 0 0 1-1 0v-4a.5.5 0 0 1 .5-.5Zm9 0h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V2.7l-3.6 3.6a.5.5 0 1 1-.7-.7L13.3 2h-2.8a.5.5 0 0 1 0-1ZM6.3 9.7a.5.5 0 0 1 0 .7L2.7 14h2.8a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 1 0v2.8l3.6-3.6a.5.5 0 0 1 .7 0Zm3.4 0a.5.5 0 0 1 .7 0l3.6 3.6v-2.8a.5.5 0 0 1 1 0v4a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1 0-1h2.8l-3.6-3.6a.5.5 0 0 1 0-.7Z"/></svg>';
+
+  function redraw(card) {
+    // Let the CSS transition settle, then ask widgets to fit their new size.
+    setTimeout(function () {
+      if (window.Plotly) {
+        card.querySelectorAll(".js-plotly-plot").forEach(function (el) {
+          try { window.Plotly.Plots.resize(el); } catch (e) { /* ignore */ }
+        });
       }
-    } catch(e) {
-      // ignore errors
-    }
-  }
-
-  function resizeLeaflet(container){
-    var leaf = container.querySelector('.leaflet-container');
-    if (leaf && leaf._leaflet_map) {
-      try { leaf._leaflet_map.invalidateSize(true); } catch(e) {}
-    }
-  }
-
-  function triggerResizes(container, expanded){
-    // Plotly widgets
-    var plots = container.querySelectorAll('.plotly');
-    plots.forEach(function(p){ resizePlotly(p, expanded); });
-    // Leaflet maps
-    resizeLeaflet(container);
-    // final window resize event to allow other widgets to react
-    setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 140);
-  }
-
-  function findCard(node){
-    var el = node;
-    while(el && !el.classList.contains('mm-card')) el = el.parentElement;
-    return el || null;
-  }
-
-  // configurable hover delay (ms); can be tuned globally
-  var MM_HOVER_DELAY_MS = 500;
-
-  function toggleCard(card){
-    if (!card) return;
-    var willExpand = !card.classList.contains('expanded-widget');
-    if (willExpand) {
-      card.classList.add('expanded-widget');
-      // create a close button if not present
-      if (!card.querySelector('.expand-close')) {
-        var btn = document.createElement('button');
-        btn.className = 'expand-close';
-        btn.setAttribute('aria-label', 'Close expanded view');
-        btn.innerHTML = '&times;';
-        btn.addEventListener('click', function(ev){ ev.stopPropagation(); card.classList.remove('expanded-widget'); triggerResizes(card, false); btn.remove(); removeOverlay(); });
-        card.appendChild(btn);
-      }
-      // show overlay when a card expands
-      showOverlay();
-    } else {
-      card.classList.remove('expanded-widget');
-      var existing = card.querySelector('.expand-close'); if (existing) existing.remove();
-      // remove overlay when collapsing
-      removeOverlay();
-    }
-    // give CSS transition a moment to apply then redraw widgets
-    setTimeout(function(){ triggerResizes(card, willExpand); }, willExpand ? 180 : 260);
-  }
-
-  function attach(){
-    var cards = document.querySelectorAll('.mm-card');
-    cards.forEach(function(card){
-      // Skip attaching expansion behavior when a card is explicitly opted-out
-      if (card.classList && (card.classList.contains('mm-feature') || card.classList.contains('mm-no-expand'))) return;
-      if (card._expandAttached) return;
-      card._expandAttached = true;
-      // dblclick remains as a fallback/power-user gesture
-      card.addEventListener('dblclick', function(e){
-        var c = findCard(e.target) || card;
-        toggleCard(c);
+      card.querySelectorAll(".leaflet-container").forEach(function (el) {
+        var widget = window.HTMLWidgets && window.HTMLWidgets.find("#" + el.id);
+        var map = widget && widget.getMap && widget.getMap();
+        if (map) map.invalidateSize(true);
       });
-      // Global single-click expand (ignore clicks on links/buttons/inputs)
-      card.addEventListener('click', function(e){
-        var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
-        if (tag === 'a' || tag === 'button' || tag === 'input' || (e.target.closest && e.target.closest('a, button, input'))) return;
-        var c = findCard(e.target) || card;
-        toggleCard(c);
-      });
+      window.dispatchEvent(new Event("resize"));
+    }, 200);
+  }
+
+  function overlay() {
+    var ov = document.querySelector(".mm-expand-overlay");
+    if (!ov) {
+      ov = document.createElement("div");
+      ov.className = "mm-expand-overlay";
+      ov.addEventListener("click", closeAll);
+      document.body.appendChild(ov);
+    }
+    return ov;
+  }
+
+  function open(card) {
+    closeAll();
+    card.classList.add("expanded-widget");
+    card.setAttribute("role", "dialog");
+    card.setAttribute("aria-modal", "true");
+    var btn = card.querySelector(".mm-expand-btn");
+    if (btn) {
+      btn.setAttribute("aria-label", "Close full-screen view");
+      btn.innerHTML = "&times;";
+    }
+    overlay();
+    document.body.classList.add("mm-noscroll");
+    redraw(card);
+  }
+
+  function close(card) {
+    card.classList.remove("expanded-widget");
+    card.removeAttribute("role");
+    card.removeAttribute("aria-modal");
+    var btn = card.querySelector(".mm-expand-btn");
+    if (btn) {
+      btn.setAttribute("aria-label", "Expand to full screen");
+      btn.innerHTML = ICON_EXPAND;
+    }
+    redraw(card);
+  }
+
+  function closeAll() {
+    document.querySelectorAll(".expanded-widget").forEach(close);
+    var ov = document.querySelector(".mm-expand-overlay");
+    if (ov) ov.remove();
+    document.body.classList.remove("mm-noscroll");
+  }
+
+  function attach(card) {
+    if (card.querySelector(":scope > .mm-expand-btn")) return;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "mm-expand-btn";
+    btn.setAttribute("aria-label", "Expand to full screen");
+    btn.innerHTML = ICON_EXPAND;
+    btn.addEventListener("click", function (ev) {
+      ev.stopPropagation();
+      if (card.classList.contains("expanded-widget")) closeAll();
+      else open(card);
     });
+    card.insertBefore(btn, card.firstChild);
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
-    attach();
-    // also try re-attaching after UI changes
-    setTimeout(attach, 900);
+  function attachAll(root) {
+    (root || document).querySelectorAll(".mm-expandable").forEach(attach);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    attachAll();
+    // Cards rendered later (e.g. inside uiOutput) get buttons too.
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (m) {
+        m.addedNodes.forEach(function (node) {
+          if (node.nodeType !== 1) return;
+          if (node.classList.contains("mm-expandable")) attach(node);
+          attachAll(node);
+        });
+      });
+    }).observe(document.body, { childList: true, subtree: true });
   });
 
-  // ESC key closes expanded cards
-  document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape'){
-      document.querySelectorAll('.expanded-widget').forEach(function(card){
-        card.classList.remove('expanded-widget');
-        triggerResizes(card, false);
-      });
-      removeOverlay();
-    }
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeAll();
   });
 
-  // Overlay helpers
-  function showOverlay(){
-    if (document.querySelector('.mm-expand-overlay')) return;
-    var ov = document.createElement('div');
-    ov.className = 'mm-expand-overlay';
-    ov.style.position = 'fixed';
-    ov.style.top = '0';
-    ov.style.left = '0';
-    ov.style.right = '0';
-    ov.style.bottom = '0';
-    ov.style.background = 'rgba(0,0,0,0.45)';
-    ov.style.zIndex = '99990';
-    ov.addEventListener('click', function(){
-      // clicking overlay closes expanded cards
-      document.querySelectorAll('.expanded-widget').forEach(function(card){ card.classList.remove('expanded-widget'); triggerResizes(card, false); });
-      removeOverlay();
-    });
-    document.body.appendChild(ov);
-  }
-
-  function removeOverlay(){
-    var ov = document.querySelector('.mm-expand-overlay'); if (ov) ov.remove();
-  }
-
-  window.__maquerina_attach_expand = attach;
+  // Close any open card when switching tabs.
+  document.addEventListener("shown.bs.tab", closeAll);
 })();
